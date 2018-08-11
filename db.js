@@ -5,7 +5,7 @@ const Discord = require('discord.js');
 var con = mysql.createConnection({
     host: "localhost",
     user: "root",
-    password: "Adminadmin1",
+    password: "",
     database: "bot"
 });
 
