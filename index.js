@@ -289,6 +289,35 @@ bot.on('message', (message) => {
 
                 break;
 
+            case 'delwarn':
+
+                if(msg.length == 2){
+                    if(!isNaN(msg[1])) {    //Wenn eine Nummer mitgegeben wurde.
+
+                        db.data.delWarning(msg[1], author, function(res){
+                            if(res.code == 1){
+                                EmbedMsg(message.channel, 0xff0000, 'Error', 'An Error occurred, did you give me a valid warningID?');
+                                log(res.result)
+                            } else if(res.code == 0){
+                                try{
+                                    EmbedMsg(message.channel, 0x00ff00, 'Success', 'You successfully deleted a warning from ' + mention(bot.users.get(res.result[0].warneduserID)));
+                                    log(author.tag + ' deleted a warning from ' + bot.users.get(res.result[0].warneduserID).tag);
+                                } catch(err){
+                                    EmbedMsg(message.channel, 0x00ff00, 'Success', 'You successfully deleted a warning');
+                                    log(author.tag + ' deleted a warning');
+                                }
+                            }
+                        });
+
+                    } else {
+                        SendSyntaxErr(message.channel);
+                    }
+                } else {
+                    SendSyntaxErr(message.channel);
+                }
+
+                break;
+
             default:
 
                 break;

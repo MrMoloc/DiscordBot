@@ -1,13 +1,9 @@
 var mysql = require('mysql');
 const Discord = require('discord.js');
+var key = require('../key.js');
 
 // Connection aufbauen
-var con = mysql.createConnection({
-    host: "localhost",
-    user: "root",
-    password: "",
-    database: "bot"
-});
+var con = mysql.createConnection(key.db);
 
 // Die Funtionen werden in eine Variable gespeichert.
 var methods = {
@@ -63,6 +59,33 @@ var methods = {
 
         });
 
+    },
+
+    delWarning: function(warnid, user, cb){
+        
+        con.query('SELECT * FROM warning WHERE warningID = ?', warnid, function(err, res){
+
+            if(err || typeof res[0] === 'undefined' ) {
+                cb({code: 1, result: err});
+                return;
+            }
+
+            if(res[0].warningID == warnid){
+
+                con.query('UPDATE warning SET deletiontime = ?, deletedbyuserID = ? WHERE warningID = ?', [getTimeStamp(), user.id, warnid], function(err1){
+
+                    if(err) {
+                        cb({code: 1, result: err1});
+                    } else {
+                        cb({code: 0, result: res});
+                    }
+
+                });
+
+            }
+
+        });
+        
     },
 
     updateGuild: function(guild) {
