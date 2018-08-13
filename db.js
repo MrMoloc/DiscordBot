@@ -191,17 +191,6 @@ var methods = {
                         if(err) log(err);
                     })
 
-                } else {
-
-                    // Wenn GuildMember schon besteht, Name updaten.
-                    con.query('UPDATE useringuild SET ? WHERE guildID = ? AND userID = ?', [{guildID: member.guild.id, userID: member.user.id},member.guild.id, member.user.id], function(err, res) {
-                        if(err) {
-                            log(err);
-                        } else {
-                            log('Updated '+role.name+' in DB');
-                        }
-                    })
-
                 }
 
             });
@@ -222,7 +211,7 @@ var methods = {
             if(err) log(err);
             if(!result[0]) {
 
-                con.query('INSERT INTO user SET ?', {userID: us.id, username: us.name}, function(err, res) {
+                con.query('INSERT INTO user SET ?', {userID: us.id, username: us.username}, function(err, res) {
                     if(err) {
                         log(err);
                     } else {
@@ -231,13 +220,13 @@ var methods = {
                     }
                 })
 
-            } else {
+            } else if(result[0].username != us.username) {
 
-                con.query('UPDATE user SET ? WHERE userID = ?', [{username: us.name}, us.id], function(err, res) {
+                con.query('UPDATE user SET ? WHERE userID = ?', [{username: us.username}, us.id], function(err, res) {
                     if(err) {
                         log(err);
                     } else {
-                        log('Updated '+role.name+' in DB');
+                        log('Updated '+us.username+' in DB');
                     }
                 })
 
