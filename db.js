@@ -175,6 +175,18 @@ var methods = {
 
     },
 
+    getWarnLog: function(guild, cb) {
+        con.query('SELECT warnlog FROM guild WHERE guildID = ' + guild.id, function (err, result) {
+     
+            if(err) {
+                cb({code: 1, result: err});
+            } else {
+                cb({code: 0, result: result[0].warnlog});
+            }
+
+        });
+    },
+
     updateUser: function(member) {
 
         // Überprüfen, ob übergebene Variable auch einem Member entspricht.
