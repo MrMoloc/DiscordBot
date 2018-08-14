@@ -147,6 +147,34 @@ var methods = {
 
     },
 
+    addClaimable: function(guild, role, cb){
+
+        con.query('UPDATE roles SET selfassign = 1 WHERE guildID = ? AND roleID = ?', [guild.id, role.id], function(err, res){
+
+            if(err) {
+                cb({code: 1, result: err});
+            } else {
+                cb({code: 0, result: res});
+            }
+
+        })
+
+    },
+
+    delClaimable: function(guild, role, cb){
+
+        con.query('UPDATE roles SET selfassign = 0 WHERE guildID = ? AND roleID = ?', [guild.id, role.id], function(err, res){
+
+            if(err) {
+                cb({code: 1, result: err});
+            } else {
+                cb({code: 0, result: res});
+            }
+
+        })
+
+    },
+
     updateRole: function(role, method) {
 
         // Hole die Rolle

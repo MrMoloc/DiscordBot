@@ -13,7 +13,9 @@ var perms = {
     warnlogall: 1,
     delwarn: 2,
     joindate: 1,
-    role: 1
+    role: 1,
+    addclaim: 4,
+    delclaim: 4
 }
 
 
@@ -468,6 +470,83 @@ bot.on('message', (message) => {
 
                     break;
 
+                case 'addclaim':
+
+                    if(userperm >= perms.addclaim){
+                        if(msg.length >= 2){
+
+                            var rolename = '';
+                            for(var i = 1; i < msg.length; i++){
+                                rolename += msg[i] + ' ';
+                            }
+                            rolename = rolename.substring(0, rolename.length -1);
+                            rolename = rolename.toLowerCase();
+                            
+
+                            var success = false;
+                            var counter = 0;
+
+                            message.guild.roles.forEach(function(role){
+
+                                if(role.name.toLowerCase() == rolename){
+                                    db.data.addClaimable(message.guild, role, function(res){
+                                        success = true;
+                                        log('This was a success!!!');
+                                        counter++;
+                                        claimCounter(counter, success, message, role);
+                                    });
+                                } else {
+                                    counter++;
+                                    claimCounter(counter, success, message);
+                                }
+                            });
+                        } else {
+                            SendSyntaxErr(message.channel);
+                        }
+                    } else {
+                        noPerm(message.channel);
+                    }
+
+                    break;
+
+                case 'delclaim':
+
+                if(userperm >= perms.delclaim){
+                    if(msg.length >= 2){
+
+                        var rolename = '';
+                        for(var i = 1; i < msg.length; i++){
+                            rolename += msg[i] + ' ';
+                        }
+                        rolename = rolename.substring(0, rolename.length -1);
+                        rolename = rolename.toLowerCase();
+                        
+
+                        var success = false;
+                        var counter = 0;
+
+                        message.guild.roles.forEach(function(role){
+
+                            if(role.name.toLowerCase() == rolename){
+                                db.data.delClaimable(message.guild, role, function(res){
+                                    success = true;
+                                    counter++;
+                                    delclaimCounter(counter, success, message, role);
+                                });
+                            } else {
+                                counter++;
+                                delclaimCounter(counter, success, message);
+                            }
+                        });
+                    } else {
+                        SendSyntaxErr(message.channel);
+                    }
+                } else {
+                    noPerm(message.channel);
+                }
+
+                    break;
+
                 default:
 
                     break;
@@ -563,4 +642,26 @@ function getName(member, cb) {
 
 function noPerm(channel){
     EmbedMsg(channel, 0xff0000, 'Insufficient Permissions', 'You don\' have the permissions required to use this command, if you think this is a mistake contact an admin');
+}
+
+function claimCounter(counter, success, message, role){
+    if(counter == message.guild.roles.size){
+        if(success == true){
+            EmbedMsg(message.channel, 0x00ff00, 'Success!', 'Role is now claimable!');
+            log(message.author.tag + ' made the role ' + role.name + ' claimable');
+        } else {
+            EmbedMsg(message.channel, 0xff0000, 'Error', 'This role doesn\'t seem to exist around here, make sure to make no typos');
+        }
+    }
+}
+
+function delclaimCounter(counter, success, message, role){
+    if(counter == message.guild.roles.size){
+        if(success == true){
+            EmbedMsg(message.channel, 0x00ff00, 'Success!', 'Role is no longer claimable!');
+            log(message.author.tag + ' made the role ' + role.name + ' unclaimable');
+        } else {
+            EmbedMsg(message.channel, 0xff0000, 'Error', 'This role doesn\'t seem to exist around here, make sure to make no typos');
+        }
+    }
 }
