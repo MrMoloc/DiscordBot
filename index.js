@@ -11,7 +11,8 @@ var perms = {
     updateguild: 5,
     warnlog: 2,
     warnlogall: 1,
-    delwarn: 2
+    delwarn: 2,
+    joindate: 1
 }
 
 
@@ -42,6 +43,14 @@ bot.on('guildUpdate', (oldGuild, newGuild) => {
 bot.on('guildMemberUpdate', (oldMember, newMember) => {
     try{
         db.data.updateUser(newMember);
+    }catch(err) {
+        log(err);
+    }
+})
+
+bot.on('guildMemberAdd', (member) => {
+    try{
+        db.data.updateUser(member);
     }catch(err) {
         log(err);
     }
@@ -104,6 +113,33 @@ bot.on('message', (message) => {
 
             switch(cmd.toLowerCase()) {
 
+                //Hilfe
+                    case 'help':
+
+                    message.channel.send({
+                        embed: {
+                            color: 0x0000ff,
+                            fields: [{
+                                name: 'swisstime',
+                                value: 'Syntax: `?swisstime`\nDescription: Returns the current time in Switzerland (CET/CEST).'
+                            },{
+                                name: 'warn',
+                                value: 'Syntax: `?warn @user reason`\nDescription: Warns a user and if a user has enough warns, he gets punished.'
+                            },{
+                                name: 'warnlog',
+                                value: 'Syntax: `?warnlog [@user]`\nDescription: Either returns the warnings of a specific user or the warnings of all users.'
+                            },{
+                                name: 'delwarn',
+                                value: 'Syntax: `?delwarn warnID`\nDescription: Deletes a warning, so it doesn\'t count towards a punishement.'
+                            },{
+                                name: 'joindate',
+                                value: 'Syntax: `?joindate [@user]`\nDescription: Returns the date and time someone last joined this Discord.'
+                            }]
+                        }
+                    });
+
+                    break;
+
                 // Datum und Zeit in der Schweiz ausgeben.
                 case "swisstime":
                     if(userperm >= perms.swisstime){
@@ -116,7 +152,7 @@ bot.on('message', (message) => {
 
                 case 'test':
                     if(userperm >= perms.test){
-                        EmbedMsg(message.channel, 0x0000ff, 'Warning issued', mention(author) + ' warned the user ' + mention(author) + ' for the reason:\n He\'s a dick LMAO');
+                        EmbedMsg(message.channel, 0x0000ff, 'Warning issued', mention(author) + ' warned the user ' + mention(author) + ' for the reason:\n He\'s a lol LMAO');
                     } else {
                         noPerm(message.channel);
                     }
@@ -148,14 +184,12 @@ bot.on('message', (message) => {
                                 db.data.newWarn(warnedUser, author, warnreason, function(resu) {
                                     if(resu.code == 1) {
                                         // Wenn Fehler auftritt (Code 1) Fehlermeldung ausgeben und Benutzer informieren.
-                                        outerr(error.result);
                                         EmbedMsg(message.channel, 0xff0000, 'Error!', 'An Error occured, please contact an Admin. Or don\'t, I\'m a bot not a cop.');
                                         // Mich per DM informieren, dass etwas mit der DB nicht stimmt.
                                         EmbedMsg(bot.users.get("153276061163978752"), 0x0000ff, 'DB broke', 'The DB broke or something I\'m sorry senpai');
                                     } else {
                                         // Erfolg, den Benutzer informieren und Logging in die Konsole.
                                         EmbedMsg(message.channel, 0x00ff00, 'Success!', 'You successfully warned ' + mention(warnedUser) + ' for: ' + warnreason);
-                                        log();
                                         db.data.getWarnLog(message.guild, function(res){
                                             EmbedMsg(message.guild.channels.get(res.result), 0x0000ff, 'Warning issued', mention(author) + ' warned the user ' + mention(warnedUser.user) + ' for the reason:\n' + warnreason);
                                         });
@@ -298,10 +332,12 @@ bot.on('message', (message) => {
                                         }
 
                                         // Anzahl der Warns des User in das Field hinzufügen.
-                                        fields.push({
-                                            name: getName(guildMember) + ':',
-                                            value: getName(guildMember) + ' has ' + counttotal + ' total warnings, ' + countdel + ' have been deleted.'
-                                        });
+                                        if(counttotal != 0){
+                                            fields.push({
+                                                name: getName(guildMember) + ':',
+                                                value: getName(guildMember) + ' has ' + counttotal + ' total warnings, ' + countdel + ' have been deleted.'
+                                            });
+                                        }
 
                                         // Ein bisschen cheaty das so zu machen, bin aber zu faul es anders zu machen
                                         // Es wird bei jedem Iterieren countermem um eins hochgezählt und wenn es so gross ist wie
@@ -364,6 +400,30 @@ bot.on('message', (message) => {
                     }
 
                     break;
+
+                case 'joindate':
+
+                    if(userperm >= perms.joindate){
+
+                        if(msg.length == 2){
+
+                            getMentioned(msg[1], message.guild, function(memb){
+                                if(!memb){
+                                    EmbedMsg(message.channel, 0xff0000, 'Error!', 'I am having trouble finding the specified user. Please mention someone that is on the server.');
+                                } else {
+                                    EmbedMsg(message.channel, 0x0000ff, 'Join Date', memb.user.username + ' joined at:\n' + memb.joinedAt);
+                                }
+                            });
+
+                        } else if(msg.length == 1){
+                            EmbedMsg(message.channel, 0x0000ff, 'Join Date', author.username + ' joined at:\n' + message.member.joinedAt);
+                        } else {
+                            SendSyntaxErr(message.channel);
+                        }
+
+                    } else {
+                        noPerm(message.channel);
+                    }
 
                 default:
 

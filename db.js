@@ -50,6 +50,11 @@ var methods = {
 
         // Abfrage nach PermissionsLevel von einem User auf einer Guild
         con.query('SELECT permlvl FROM useringuild WHERE userID = ' + member.id + ' AND guildID = ' + member.guild.id, function (err, result) {
+
+            if(err || typeof result[0] === 'undefined' ) {
+                cb({code: 1, result: err});
+                return;
+            }
      
             if(err) {
                 cb({code: 1, result: err});
@@ -201,6 +206,7 @@ var methods = {
 
                     con.query('INSERT INTO useringuild SET ?', {guildID: member.guild.id, userID: member.user.id}, function(err, resul) {
                         if(err) log(err);
+                        log('Added '+member.user.tag+' to the users');
                     })
 
                 }
