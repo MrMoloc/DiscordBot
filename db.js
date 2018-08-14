@@ -133,6 +133,20 @@ var methods = {
 
     },
 
+    claimableRoles: function(guild, cb){
+
+        con.query('SELECT * FROM roles WHERE guildID = ? AND selfassign = 1', guild.id, function(err, result){
+
+            if(err) {
+                cb({code: 1, result: err});
+            } else {
+                cb({code: 0, result: result});
+            }
+
+        });
+
+    },
+
     updateRole: function(role, method) {
 
         // Hole die Rolle

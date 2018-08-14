@@ -12,7 +12,8 @@ var perms = {
     warnlog: 2,
     warnlogall: 1,
     delwarn: 2,
-    joindate: 1
+    joindate: 1,
+    role: 1
 }
 
 
@@ -424,6 +425,48 @@ bot.on('message', (message) => {
                     } else {
                         noPerm(message.channel);
                     }
+
+                break;
+
+                case 'role':
+
+                    if(userperm >= perms.role){
+
+                        if(msg.length == 2){
+
+                            var claimable = false;
+
+                            db.data.claimableRoles(message.guild, function(roles){
+                                for(var i = 0; i < roles.result.length; i++){
+                                    if(msg[1].toLowerCase() == roles.result[i].rolename.toLowerCase()){
+                                        if(message.member.roles.get(roles.result[i].roleID)){
+                                            claimable = true;
+                                            log(author.tag + ' tried claiming the role ' + msg[1] + ', but they already have it...');
+                                            EmbedMsg(message.channel, 0xff0000, 'Role claiming failed', 'You already have this role...');
+                                            break;
+                                        } else {
+                                            claimable = true;
+                                            log(author.tag + ' claimed the role ' + roles.result[i].rolename);
+                                            EmbedMsg(message.channel, 0x00ff00, 'Role claimed!', 'You successfully claimed the role ' + roles.result[i].rolename);
+                                            message.member.addRole(roles.result[i].roleID, 'Claimed by user');
+                                        }
+                                    }
+                                }
+                                if(!claimable){
+                                    EmbedMsg(message.channel, 0xff0000, 'Error', 'You can\'t claim this role.');
+                                    log(author.tag + ' tried claiming the role ' + msg[1]);
+                                }
+                            });
+
+                        } else {
+                            SendSyntaxErr(message.channel);
+                        }
+
+                    } else {
+                        noPerm(message.channel);
+                    }
+
+                    break;
 
                 default:
 
