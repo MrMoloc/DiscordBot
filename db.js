@@ -205,7 +205,7 @@ var methods = {
             us = member;
         }
 
-        // User Updaten, das ganzne Zeug wie oben mit dem GuildMember... Bla bla bla
+        // User Updaten, das ganze Zeug wie oben mit dem GuildMember... Bla bla bla
         con.query('SELECT * FROM user WHERE userID = ' + us.id, function (err, result, fields) {
 
             if(err) log(err);
