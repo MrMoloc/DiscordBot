@@ -155,6 +155,10 @@ bot.on('message', (message) => {
                                     } else {
                                         // Erfolg, den Benutzer informieren und Logging in die Konsole.
                                         EmbedMsg(message.channel, 0x00ff00, 'Success!', 'You successfully warned ' + mention(warnedUser) + ' for: ' + warnreason);
+                                        log();
+                                        db.data.getWarnLog(message.guild, function(res){
+                                            EmbedMsg(message.guild.channels.get(res.result), 0x0000ff, 'Warning issued', mention(author) + ' warned the user ' + mention(warnedUser.user) + ' for the reason:\n' + warnreason);
+                                        });
                                         log(author.tag + ' warned ' + warnedUser.user.tag);
                                     }
                                 });
