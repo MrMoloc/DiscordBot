@@ -434,16 +434,22 @@ bot.on('message', (message) => {
 
                     if(userperm >= perms.role){
 
-                        if(msg.length == 2){
+                        if(msg.length >= 2){
 
                             var claimable = false;
 
+                            var rolename = '';
+                            for(var i = 1; i < msg.length; i++){
+                                rolename += msg[i] + ' ';
+                            }
+                            rolename = rolename.substring(0, rolename.length -1);
+
                             db.data.claimableRoles(message.guild, function(roles){
                                 for(var i = 0; i < roles.result.length; i++){
-                                    if(msg[1].toLowerCase() == roles.result[i].rolename.toLowerCase()){
+                                    if(rolename == roles.result[i].rolename.toLowerCase()){
                                         if(message.member.roles.get(roles.result[i].roleID)){
                                             claimable = true;
-                                            log(author.tag + ' tried claiming the role ' + msg[1] + ', but they already have it...');
+                                            log(author.tag + ' tried claiming the role ' + rolename + ', but they already have it...');
                                             EmbedMsg(message.channel, 0xff0000, 'Role claiming failed', 'You already have this role...');
                                             break;
                                         } else {
