@@ -28,6 +28,11 @@ bot.on('ready', () => {
         // guild.roles.forEach(function(role, roleID) {
         // db.data.updateRole(role);
         // })
+
+        guild.roles.forEach(function(role){
+            db.data.updateRole(role, 'create');
+        });
+
         guild.members.forEach(function(guildMember, MemberID){
             db.data.updateUser(guildMember);
         })

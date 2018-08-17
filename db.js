@@ -55,11 +55,38 @@ var methods = {
                 cb({code: 1, result: err});
                 return;
             }
-     
-            if(err) {
-                cb({code: 1, result: err});
+
+            if(result[0].permlvl > 1){
+
+                if(err) {
+                    cb({code: 1, result: err});
+                } else {
+                    cb({code: 0, result: result[0].permlvl});
+                }
+
             } else {
-                cb({code: 0, result: result[0].permlvl});
+                
+                con.query('SELECT * FROM roles WHERE permlvl > 1 AND guildID = ?', member.guild.id, function(err, res){
+                    var maxperm = 1;
+
+                    for(var i = 0; i < res.length; i++){
+                        member.roles.forEach(function(role){
+                            if(role.id == res[i].roleID){
+                                if(res[i].permlvl > maxperm){
+                                    maxperm = res[i].permlvl;
+                                }
+                            }
+                        })
+                    }
+
+                    if(err) {
+                        cb({code: 1, result: err});
+                    } else {
+                        cb({code: 0, result: maxperm});
+                    }
+
+                });
+                
             }
 
         });
@@ -195,7 +222,7 @@ var methods = {
                         }
                     })
                 // Wenn sie existiert, soll der Name geupdated werden.
-                } else {
+                } else if(role.name != result[0].rolename){
                     con.query('UPDATE roles SET ? WHERE roleID = ?', [{rolename: role.name}, role.id], function(err, res) {
                         if(err) {
                             log(err);
