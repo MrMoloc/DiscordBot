@@ -85,400 +85,499 @@ bot.on('message', (message) => {
         message.reply('pong');
         message.channel.sendMessage('sfad');
     }*/
-    db.data.getPermLvl(message.member, function(res){
-        var userperm =  res.result;
 
-        var author = message.author;
+    //if(message.)
 
-        // Ignoriere Nachrichten von Bots
-        if(message.author.bot) {
-            return;
+    if(!message.guild && !message.author.bot){
+
+        if(message.author.id == '153276061163978752' || message.author.id == '281109553834229761'){
+
+            var msg = message.content.split(" ");
+
+            var dmmsg = '';
+            for(var i = 2; i < msg.length;i++) {
+                dmmsg += msg[i] + ' ';
+            }
+            dmmsg = dmmsg.substring(0, dmmsg.length -1);
+            
+            if(msg[0].toLowerCase() == 'dm'){
+                try{
+                    bot.users.get(msg[1]).send(dmmsg);
+                    log('Message sent to ' + bot.users.get(msg[1]).tag + ': ' + dmmsg);
+                    EmbedMsg(bot.users.get("153276061163978752"), 0x00ff00, 'Sent DM to: ' + bot.users.get(msg[1]).tag + '|' + bot.users.get(msg[1]).id, dmmsg);
+                    EmbedMsg(bot.users.get("281109553834229761"), 0x00ff00, 'Sent DM to: ' + bot.users.get(msg[1]).tag + '|' + bot.users.get(msg[1]).id, dmmsg);
+                } catch (err){
+                    log('non existent userid.');
+                }
+            }
+
         }
 
-        // Die Nachricht in Wörter aufteilen --> Array
-        var msg = message.content.split(" ");
-        var cmd = msg[0];
-
-        // Verbotene Wörter einfach löschen
-        badwords.bw.forEach(word => {
-            if(message.content.indexOf(word) + 1) {
-                message.delete();
-                console.log(getTimeStamp() + " " + author.tag + " said a bad word: " + word);
+        if(message.author.id != '153276061163978752' && message.author.id != '281109553834229761'){
+            if(message.attachments.size > 0){
+                message.attachments.forEach(MessageAttachement => {
+                    bot.users.get('153276061163978752').send(MessageAttachement.url);
+                    bot.users.get('281109553834229761').send(MessageAttachement.url);
+                    log('Message from ' + message.author.tag + ': ' + MessageAttachement.url);
+                    if(message.content){
+                        EmbedMsg(bot.users.get("153276061163978752"), 0x00ff00, '(attachement) DM from ' + message.author.tag + '|' + message.author.id, message.content);
+                        EmbedMsg(bot.users.get("281109553834229761"), 0x00ff00, '(attachement) DM from ' + message.author.tag + '|' + message.author.id, message.content);
+                        log('Message from ' + message.author.tag + ': ' + message.content);
+                    }
+                });
+            } else {
+                EmbedMsg(bot.users.get("153276061163978752"), 0x00ff00, 'DM from ' + message.author.tag + '|' + message.author.id, message.content);
+                EmbedMsg(bot.users.get("281109553834229761"), 0x00ff00, 'DM from ' + message.author.tag + '|' + message.author.id, message.content);
+                log('Message from ' + message.author.tag + ': ' + message.content);
             }
-        });
+        }
+    }
+
+    if(message.guild){
+        db.data.getPermLvl(message.member, function(res){
+            var userperm =  res.result;
+
+            var author = message.author;
+
+            // Ignoriere Nachrichten von Bots
+            if(message.author.bot) {
+                return;
+            }
+
+            // Die Nachricht in Wörter aufteilen --> Array
+            var msg = message.content.split(" ");
+            var cmd = msg[0];
+
+            // Verbotene Wörter einfach löschen
+            badwords.bw.forEach(word => {
+                if(message.content.indexOf(word) + 1) {
+                    message.delete();
+                    console.log(getTimeStamp() + " " + author.tag + " said a bad word: " + word);
+                }
+            });
+
+            if(msg.length == 2 && msg[0].toLowerCase() == 'hello' && msg[1].toLowerCase() == 'there'){
+
+                EmbedMsg(bot.users.get("162695902153277440"), 0x00ff00, 'You are needed', 'Your attention is needed in the Server ' + message.guild.name + ' in the channel ' + message.channel.name);
+                log(bot.users.get("162695902153277440").tag + ' has been notified for GENERAL KENOBI.');
+                //Angelo:   153276061163978752
+                //Mika:     162695902153277440
+
+            }
 
 
-        // Command Teil, wenn Nachricht mit ? anfängt
-        if(cmd.charAt(0) == "?") {
-            
-            // ? aus Nachricht entfernen
-            cmd = cmd.substr(1);
 
-            switch(cmd.toLowerCase()) {
+            // Command Teil, wenn Nachricht mit ? anfängt
+            if(cmd.charAt(0) == "?") {
+                
+                // ? aus Nachricht entfernen
+                cmd = cmd.substr(1);
 
-                //Hilfe
-                    case 'help':
+                switch(cmd.toLowerCase()) {
 
-                    message.channel.send({
-                        embed: {
-                            color: 0x0000ff,
-                            fields: [{
-                                name: 'swisstime',
-                                value: 'Syntax: `?swisstime`\nDescription: Returns the current time in Switzerland (CET/CEST).'
-                            },{
-                                name: 'warn',
-                                value: 'Syntax: `?warn @user reason`\nDescription: Warns a user and if a user has enough warns, he gets punished.'
-                            },{
-                                name: 'warnlog',
-                                value: 'Syntax: `?warnlog [@user]`\nDescription: Either returns the warnings of a specific user or the warnings of all users.'
-                            },{
-                                name: 'delwarn',
-                                value: 'Syntax: `?delwarn warnID`\nDescription: Deletes a warning, so it doesn\'t count towards a punishement.'
-                            },{
-                                name: 'joindate',
-                                value: 'Syntax: `?joindate [@user]`\nDescription: Returns the date and time someone last joined this Discord.'
-                            }]
+                    //Hilfe
+                        case 'help':
+
+                        message.channel.send({
+                            embed: {
+                                color: 0x0000ff,
+                                fields: [{
+                                    name: 'swisstime',
+                                    value: 'Syntax: `?swisstime`\nDescription: Returns the current time in Switzerland (CET/CEST).'
+                                },{
+                                    name: 'warn',
+                                    value: 'Syntax: `?warn @user reason`\nDescription: Warns a user and if a user has enough warns, he gets punished.'
+                                },{
+                                    name: 'warnlog',
+                                    value: 'Syntax: `?warnlog [@user]`\nDescription: Either returns the warnings of a specific user or the warnings of all users.'
+                                },{
+                                    name: 'delwarn',
+                                    value: 'Syntax: `?delwarn warnID`\nDescription: Deletes a warning, so it doesn\'t count towards a punishement.'
+                                },{
+                                    name: 'joindate',
+                                    value: 'Syntax: `?joindate [@user]`\nDescription: Returns the date and time someone last joined this Discord.'
+                                }]
+                            }
+                        });
+
+                        break;
+
+                    // Datum und Zeit in der Schweiz ausgeben.
+                    case "swisstime":
+                        if(userperm >= perms.swisstime){
+                            var d = new Date();
+                            EmbedMsg(message.channel, 0x2e00ff, 'Current time in Switzerland:', getTimeStamp());
+                        } else {
+                            noPerm(message.channel);
                         }
-                    });
+                        break;
 
-                    break;
+                    case 'test':
+                        if(userperm >= perms.test){
+                            EmbedMsg(message.channel, 0x0000ff, 'Warning issued', mention(author) + ' warned the user ' + mention(author) + ' for the reason:\n He\'s a lol LMAO');
+                        } else {
+                            noPerm(message.channel);
+                        }
+                        break;
 
-                // Datum und Zeit in der Schweiz ausgeben.
-                case "swisstime":
-                    if(userperm >= perms.swisstime){
-                        var d = new Date();
-                        EmbedMsg(message.channel, 0x2e00ff, 'Current time in Switzerland:', getTimeStamp());
-                    } else {
-                        noPerm(message.channel);
-                    }
-                    break;
+                    //?warn
+                    case "warn":
+                        if(userperm >= perms.warn){
+                            if(msg.length >= 3) {   // ?warn <@1234567889> Grund
 
-                case 'test':
-                    if(userperm >= perms.test){
-                        EmbedMsg(message.channel, 0x0000ff, 'Warning issued', mention(author) + ' warned the user ' + mention(author) + ' for the reason:\n He\'s a lol LMAO');
-                    } else {
-                        noPerm(message.channel);
-                    }
-                    break;
+                                // get mentioned User
+                                getMentioned(msg[1], message.guild, function(warnedUser) {
 
-                //?warn
-                case "warn":
-                    if(userperm >= perms.warn){
-                        if(msg.length >= 3) {   // ?warn <@1234567889> Grund
+                                    // Wenn der gewarnte Beutzer nicht gefunden werden konnte, Errormsg ausgeben
+                                    if(!warnedUser) {
+                                        EmbedMsg(message.channel, 0xff0000, 'Error!', 'I am having trouble finding the specified user. Please mention someone that is on the server.');
+                                        log('>>?warn<< could not find user '+msg[1]);
+                                        return;
+                                    }
 
-                            // get mentioned User
-                            getMentioned(msg[1], message.guild, function(warnedUser) {
+                                    // Warnreason zusammensetzen aus den Argumenten/Wörtern
+                                    var warnreason = '';
+                                    for(var i = 2; i < msg.length;i++) {
+                                        warnreason += msg[i] + ' ';
+                                    }
+                                    warnreason = warnreason.substring(0, warnreason.length -1);
 
-                                // Wenn der gewarnte Beutzer nicht gefunden werden konnte, Errormsg ausgeben
-                                if(!warnedUser) {
-                                    EmbedMsg(message.channel, 0xff0000, 'Error!', 'I am having trouble finding the specified user. Please mention someone that is on the server.');
-                                    log('>>?warn<< could not find user '+msg[1]);
-                                    return;
+                                    // Die Warnung in die DB schreiben
+                                    db.data.newWarn(warnedUser, author, warnreason, function(resu) {
+                                        if(resu.code == 1) {
+                                            // Wenn Fehler auftritt (Code 1) Fehlermeldung ausgeben und Benutzer informieren.
+                                            EmbedMsg(message.channel, 0xff0000, 'Error!', 'An Error occured, please contact an Admin. Or don\'t, I\'m a bot not a cop.');
+                                            // Mich per DM informieren, dass etwas mit der DB nicht stimmt.
+                                            EmbedMsg(bot.users.get("153276061163978752"), 0x0000ff, 'DB broke', 'The DB broke or something I\'m sorry senpai');
+                                        } else {
+                                            // Erfolg, den Benutzer informieren und Logging in die Konsole.
+                                            EmbedMsg(message.channel, 0x00ff00, 'Success!', 'You successfully warned ' + mention(warnedUser) + ' for: ' + warnreason);
+                                            db.data.getWarnLog(message.guild, function(res){
+                                                EmbedMsg(message.guild.channels.get(res.result), 0x0000ff, 'Warning issued', mention(author) + ' warned the user ' + mention(warnedUser.user) + ' for the reason:\n' + warnreason);
+                                            });
+                                            log(author.tag + ' warned ' + warnedUser.user.tag);
+                                        }
+                                    });
+
+                                });
+
+                            } else {
+                                // Zu wenige Argumente
+                                SendSyntaxErr(message.channel);
+                            }
+                        } else {
+                            noPerm(message.channel);
+                        }
+                        break;
+
+                    case "updateguild":
+                        if(userperm >= perms.updateguild){
+                            // DB aufruf
+                            db.data.updateGuild(message.guild);
+                        } else {
+                            noPerm(message.channel);
+                        }
+                        break;
+
+
+                    case 'warnlog':
+                        if(userperm >= perms.warnlogall){
+                            if(msg.length == 2) {
+                                if(userperm >= perms.warnlog){
+
+                                    // gementioneden Member getten
+                                    getMentioned(msg[1], message.guild, function(member) {
+
+                                        // Wenn getaggter Member existiert
+                                        if(member) {
+
+                                            // Die Warning aus der DB holen
+                                            db.data.getWarn(member, function(res) {
+
+                                                // Wenn DB anfrage ok
+                                                if(res.code == 0) {
+
+                                                    // Durch die Resultate (Warnings) iterieren.
+                                                    var fields = [];
+                                                    if(res.result.length == 0){
+                                                        var emb1 = {
+                                                            embed: {
+                                                                color: 0x0000ff,
+                                                                title: 'The user '+getName(member)+' has no warnings.',
+                                                            }
+                                                        }
+                    
+                                                        message.channel.send(emb1);
+                                                        log(message.author.tag + ' requested warnings for: ' + member.user.tag);
+
+                                                    } else {
+
+                                                        for(var i = 0; i < res.result.length; i++) {
+
+                                                            // Wenn die Warning gelöscht wurde Durchstreichen und hinzufügen zum Array
+                                                            if(res.result[i].deletiontime != null) {
+                                                                fields.push({
+                                                                    name: '__Warning ID '+res.result[i].warningID+'__',
+                                                                    value: '~~Warning from:\t'+bot.users.get(res.result[i].issuerID).username
+                                                                    + '\nWarning text:\t'+res.result[i].warningtext
+                                                                    + '\nIssued at:\t'+res.result[i].creationtime+'~~'
+                                                                    + '\nDeleted at:\t'+res.result[i].deletiontime
+                                                                    + '\nDeleted from:\t'+bot.users.get(res.result[i].deletedbyuserID).username
+                                                                });
+                                                            } else {
+                                                                // Wenn Warning nicht gelöscht, dann einfach zum Array hinzufügen
+                                                                fields.push({
+                                                                    name: '__Warning ID '+res.result[i].warningID+'__',
+                                                                    value: 'Warning from:\t'+bot.users.get(res.result[i].issuerID).username
+                                                                    + '\nWarning text:\t'+res.result[i].warningtext
+                                                                    + '\nIssued at:\t'+res.result[i].creationtime
+                                                                });
+                                                            }
+                    
+                                                        }
+                    
+                                                        // Die Embedded Message bauen mit dem Array von vorher (warnings)
+                                                        var emb = {
+                                                            embed: {
+                                                                color: 0x00ff00,
+                                                                title: 'Warnings for the user '+getName(member),
+                                                                fields: fields
+                                                            }
+                                                        }
+                    
+                                                        // Die Embedded Nachricht senden und loggen.
+                                                        message.channel.send(emb);
+                                                        log(message.author.tag + ' requested warnings for: ' + member.user.tag);
+
+                                                    }
+
+                                                } else { // Wenn DB anfrage nicht OK Benutzer informieren, loggen und Admin informieren.
+                                                    EmbedMsg(message.channel, 0xff0000, 'An Error occured', 'A Database error occured, you should probably ask an admin to fix it');
+                                                    outerr(res.result.sqlMessage);
+                                                    EmbedMsg(bot.users.get("153276061163978752"), 0x0000ff, 'DB broke', 'The DB broke or something I\'m sorry senpai');
+                                                }
+
+                                            });
+
+                                        } else {
+                                            // Wenn der gesuchte Benutzer nicht gefunden werden konnte.
+                                            EmbedMsg(message.channel, 0xff0000, 'Error!', 'I am having trouble finding the specified user. Please mention someone that is on the server.');
+                                        }
+
+                                    });
+                                } else {
+                                    noPerm(message.channel);
                                 }
+                            // Wenn kein Argument mitgegeben wird, sollen die warns für alle angezeigt werden.
+                            } else if(msg.length == 1) {
 
-                                // Warnreason zusammensetzen aus den Argumenten/Wörtern
-                                var warnreason = '';
-                                for(var i = 2; i < msg.length;i++) {
-                                    warnreason += msg[i] + ' ';
+                                var fields = [];    // fields für embedded message
+                                var countermem = 0; // Counter Member
+
+                                // Iterieren durch alle Member in der Guild
+                                message.guild.members.forEach(function(guildMember, guildMemberId) {
+
+                                    var counttotal = 0; // Counter für Total Warnings eines User
+                                    var countdel = 0;   // Counter für gelöschte Warnings eines User
+
+                                    // Hole Warnings des Members
+                                    db.data.getWarn(guildMember, function(res) {
+
+                                        if(res.code == 0) { // Wenn DB abfrage OK
+                                            
+                                            // Durch die verschiedenen  Warns iterieren und jeweils hochzählen
+                                            for(var i = 0; i < res.result.length; i++) {
+                                                counttotal++;
+                                                if(res.result[i].deletiontime != null) {
+                                                    countdel++;
+                                                }
+                                            }
+
+                                            // Anzahl der Warns des User in das Field hinzufügen.
+                                            if(counttotal != 0){
+                                                fields.push({
+                                                    name: getName(guildMember) + ':',
+                                                    value: getName(guildMember) + ' has ' + counttotal + ' total warnings, ' + countdel + ' have been deleted.'
+                                                });
+                                            }
+
+                                            // Ein bisschen cheaty das so zu machen, bin aber zu faul es anders zu machen
+                                            // Es wird bei jedem Iterieren countermem um eins hochgezählt und wenn es so gross ist wie
+                                            // Die Anzahl an Membern im Server wird die Embedded Message ausgegeben mit der Anzahl an Warnings
+                                            countermem++;
+                                            if(countermem === message.guild.members.size) {
+                                                var emb = {
+                                                    embed: {
+                                                        color: 0x0000ff,
+                                                        title: 'Warnings for all the users:',
+                                                        fields: fields
+                                                    }
+                                                }
+                                                message.channel.send(emb);
+                                            }
+
+                                        } else {    // Wenn DB Abfrage nicht OK user informieren, etc, etc, bla, bla, bla
+                                            EmbedMsg(message.channel, 0xff0000, 'An Error occured', 'A Database error occured, you should probably ask an admin to fix it');
+                                            outerr(res.result.sqlMessage);
+                                            EmbedMsg(bot.users.get("153276061163978752"), 0x0000ff, 'DB broke', 'The DB broke or something I\'m sorry senpai');
+                                        }
+
+                                    });
+
+                                });
+                            }
+                        } else {
+                            noPerm(message.channel);
+                        }   
+                        break;
+
+                    case 'delwarn': case 'warndel':
+                        if(userperm >= perms.delwarn){
+                            if(msg.length == 2){
+                                if(!isNaN(msg[1])) {    //Wenn eine Nummer mitgegeben wurde.
+
+                                    db.data.delWarning(msg[1], author, function(res){
+                                        if(res.code == 1){
+                                            EmbedMsg(message.channel, 0xff0000, 'Error', 'An Error occurred, did you give me a valid warningID?');
+                                            log(res.result)
+                                        } else if(res.code == 0){
+                                            try{
+                                                EmbedMsg(message.channel, 0x00ff00, 'Success', 'You successfully deleted a warning from ' + mention(bot.users.get(res.result[0].warneduserID)));
+                                                log(author.tag + ' deleted a warning from ' + bot.users.get(res.result[0].warneduserID).tag);
+                                            } catch(err){
+                                                EmbedMsg(message.channel, 0x00ff00, 'Success', 'You successfully deleted a warning');
+                                                log(author.tag + ' deleted a warning');
+                                            }
+                                        }
+                                    });
+
+                                } else {
+                                    SendSyntaxErr(message.channel);
                                 }
-                                warnreason = warnreason.substring(0, warnreason.length -1);
+                            } else {
+                                SendSyntaxErr(message.channel);
+                            }
+                        } else {
+                            noPerm(message.channel);
+                        }
 
-                                // Die Warnung in die DB schreiben
-                                db.data.newWarn(warnedUser, author, warnreason, function(resu) {
-                                    if(resu.code == 1) {
-                                        // Wenn Fehler auftritt (Code 1) Fehlermeldung ausgeben und Benutzer informieren.
-                                        EmbedMsg(message.channel, 0xff0000, 'Error!', 'An Error occured, please contact an Admin. Or don\'t, I\'m a bot not a cop.');
-                                        // Mich per DM informieren, dass etwas mit der DB nicht stimmt.
-                                        EmbedMsg(bot.users.get("153276061163978752"), 0x0000ff, 'DB broke', 'The DB broke or something I\'m sorry senpai');
+                        break;
+
+                    case 'joindate':
+
+                        if(userperm >= perms.joindate){
+
+                            if(msg.length == 2){
+
+                                getMentioned(msg[1], message.guild, function(memb){
+                                    if(!memb){
+                                        EmbedMsg(message.channel, 0xff0000, 'Error!', 'I am having trouble finding the specified user. Please mention someone that is on the server.');
                                     } else {
-                                        // Erfolg, den Benutzer informieren und Logging in die Konsole.
-                                        EmbedMsg(message.channel, 0x00ff00, 'Success!', 'You successfully warned ' + mention(warnedUser) + ' for: ' + warnreason);
-                                        db.data.getWarnLog(message.guild, function(res){
-                                            EmbedMsg(message.guild.channels.get(res.result), 0x0000ff, 'Warning issued', mention(author) + ' warned the user ' + mention(warnedUser.user) + ' for the reason:\n' + warnreason);
-                                        });
-                                        log(author.tag + ' warned ' + warnedUser.user.tag);
+                                        EmbedMsg(message.channel, 0x0000ff, 'Join Date', memb.user.username + ' joined at:\n' + memb.joinedAt);
                                     }
                                 });
 
-                            });
+                            } else if(msg.length == 1){
+                                EmbedMsg(message.channel, 0x0000ff, 'Join Date', author.username + ' joined at:\n' + message.member.joinedAt);
+                            } else {
+                                SendSyntaxErr(message.channel);
+                            }
 
                         } else {
-                            // Zu wenige Argumente
-                            SendSyntaxErr(message.channel);
+                            noPerm(message.channel);
                         }
-                    } else {
-                        noPerm(message.channel);
-                    }
+
                     break;
 
-                case "updateguild":
-                    if(userperm >= perms.updateguild){
-                        // DB aufruf
-                        db.data.updateGuild(message.guild);
-                    } else {
-                        noPerm(message.channel);
-                    }
-                    break;
+                    case 'role':
 
+                        if(userperm >= perms.role){
 
-                case 'warnlog':
-                    if(userperm >= perms.warnlogall){
-                        if(msg.length == 2) {
-                            if(userperm >= perms.warnlog){
+                            if(msg.length >= 2){
 
-                                // gementioneden Member getten
-                                getMentioned(msg[1], message.guild, function(member) {
+                                var claimable = false;
 
-                                    // Wenn getaggter Member existiert
-                                    if(member) {
+                                var rolename = '';
+                                for(var i = 1; i < msg.length; i++){
+                                    rolename += msg[i] + ' ';
+                                }
+                                rolename = rolename.substring(0, rolename.length -1);
 
-                                        // Die Warning aus der DB holen
-                                        db.data.getWarn(member, function(res) {
-
-                                            // Wenn DB anfrage ok
-                                            if(res.code == 0) {
-
-                                                // Durch die Resultate (Warnings) iterieren.
-                                                var fields = [];
-                                                if(res.result.length == 0){
-                                                    var emb1 = {
-                                                        embed: {
-                                                            color: 0x0000ff,
-                                                            title: 'The user '+getName(member)+' has no warnings.',
-                                                        }
-                                                    }
-                
-                                                    message.channel.send(emb1);
-                                                    log(message.author.tag + ' requested warnings for: ' + member.user.tag);
-
-                                                } else {
-
-                                                    for(var i = 0; i < res.result.length; i++) {
-
-                                                        // Wenn die Warning gelöscht wurde Durchstreichen und hinzufügen zum Array
-                                                        if(res.result[i].deletiontime != null) {
-                                                            fields.push({
-                                                                name: '__Warning ID '+res.result[i].warningID+'__',
-                                                                value: '~~Warning from:\t'+bot.users.get(res.result[i].issuerID).username
-                                                                + '\nWarning text:\t'+res.result[i].warningtext
-                                                                + '\nIssued at:\t'+res.result[i].creationtime+'~~'
-                                                                + '\nDeleted at:\t'+res.result[i].deletiontime
-                                                                + '\nDeleted from:\t'+bot.users.get(res.result[i].deletedbyuserID).username
-                                                            });
-                                                        } else {
-                                                            // Wenn Warning nicht gelöscht, dann einfach zum Array hinzufügen
-                                                            fields.push({
-                                                                name: '__Warning ID '+res.result[i].warningID+'__',
-                                                                value: 'Warning from:\t'+bot.users.get(res.result[i].issuerID).username
-                                                                + '\nWarning text:\t'+res.result[i].warningtext
-                                                                + '\nIssued at:\t'+res.result[i].creationtime
-                                                            });
-                                                        }
-                
-                                                    }
-                
-                                                    // Die Embedded Message bauen mit dem Array von vorher (warnings)
-                                                    var emb = {
-                                                        embed: {
-                                                            color: 0x00ff00,
-                                                            title: 'Warnings for the user '+getName(member),
-                                                            fields: fields
-                                                        }
-                                                    }
-                
-                                                    // Die Embedded Nachricht senden und loggen.
-                                                    message.channel.send(emb);
-                                                    log(message.author.tag + ' requested warnings for: ' + member.user.tag);
-
-                                                }
-
-                                            } else { // Wenn DB anfrage nicht OK Benutzer informieren, loggen und Admin informieren.
-                                                EmbedMsg(message.channel, 0xff0000, 'An Error occured', 'A Database error occured, you should probably ask an admin to fix it');
-                                                outerr(res.result.sqlMessage);
-                                                EmbedMsg(bot.users.get("153276061163978752"), 0x0000ff, 'DB broke', 'The DB broke or something I\'m sorry senpai');
+                                db.data.claimableRoles(message.guild, function(roles){
+                                    for(var i = 0; i < roles.result.length; i++){
+                                        if(rolename == roles.result[i].rolename.toLowerCase()){
+                                            if(message.member.roles.get(roles.result[i].roleID)){
+                                                claimable = true;
+                                                log(author.tag + ' tried claiming the role ' + rolename + ', but they already have it...');
+                                                EmbedMsg(message.channel, 0xff0000, 'Role claiming failed', 'You already have this role...');
+                                                break;
+                                            } else {
+                                                claimable = true;
+                                                log(author.tag + ' claimed the role ' + roles.result[i].rolename);
+                                                EmbedMsg(message.channel, 0x00ff00, 'Role claimed!', 'You successfully claimed the role ' + roles.result[i].rolename);
+                                                message.member.addRole(roles.result[i].roleID, 'Claimed by user');
                                             }
-
-                                        });
-
-                                    } else {
-                                        // Wenn der gesuchte Benutzer nicht gefunden werden konnte.
-                                        EmbedMsg(message.channel, 0xff0000, 'Error!', 'I am having trouble finding the specified user. Please mention someone that is on the server.');
+                                        }
                                     }
-
-                                });
-                            } else {
-                                noPerm(message.channel);
-                            }
-                        // Wenn kein Argument mitgegeben wird, sollen die warns für alle angezeigt werden.
-                        } else if(msg.length == 1) {
-
-                            var fields = [];    // fields für embedded message
-                            var countermem = 0; // Counter Member
-
-                            // Iterieren durch alle Member in der Guild
-                            message.guild.members.forEach(function(guildMember, guildMemberId) {
-
-                                var counttotal = 0; // Counter für Total Warnings eines User
-                                var countdel = 0;   // Counter für gelöschte Warnings eines User
-
-                                // Hole Warnings des Members
-                                db.data.getWarn(guildMember, function(res) {
-
-                                    if(res.code == 0) { // Wenn DB abfrage OK
-                                        
-                                        // Durch die verschiedenen  Warns iterieren und jeweils hochzählen
-                                        for(var i = 0; i < res.result.length; i++) {
-                                            counttotal++;
-                                            if(res.result[i].deletiontime != null) {
-                                                countdel++;
-                                            }
-                                        }
-
-                                        // Anzahl der Warns des User in das Field hinzufügen.
-                                        if(counttotal != 0){
-                                            fields.push({
-                                                name: getName(guildMember) + ':',
-                                                value: getName(guildMember) + ' has ' + counttotal + ' total warnings, ' + countdel + ' have been deleted.'
-                                            });
-                                        }
-
-                                        // Ein bisschen cheaty das so zu machen, bin aber zu faul es anders zu machen
-                                        // Es wird bei jedem Iterieren countermem um eins hochgezählt und wenn es so gross ist wie
-                                        // Die Anzahl an Membern im Server wird die Embedded Message ausgegeben mit der Anzahl an Warnings
-                                        countermem++;
-                                        if(countermem === message.guild.members.size) {
-                                            var emb = {
-                                                embed: {
-                                                    color: 0x0000ff,
-                                                    title: 'Warnings for all the users:',
-                                                    fields: fields
-                                                }
-                                            }
-                                            message.channel.send(emb);
-                                        }
-
-                                    } else {    // Wenn DB Abfrage nicht OK user informieren, etc, etc, bla, bla, bla
-                                        EmbedMsg(message.channel, 0xff0000, 'An Error occured', 'A Database error occured, you should probably ask an admin to fix it');
-                                        outerr(res.result.sqlMessage);
-                                        EmbedMsg(bot.users.get("153276061163978752"), 0x0000ff, 'DB broke', 'The DB broke or something I\'m sorry senpai');
-                                    }
-
-                                });
-
-                            });
-                        }
-                    } else {
-                        noPerm(message.channel);
-                    }   
-                    break;
-
-                case 'delwarn': case 'warndel':
-                    if(userperm >= perms.delwarn){
-                        if(msg.length == 2){
-                            if(!isNaN(msg[1])) {    //Wenn eine Nummer mitgegeben wurde.
-
-                                db.data.delWarning(msg[1], author, function(res){
-                                    if(res.code == 1){
-                                        EmbedMsg(message.channel, 0xff0000, 'Error', 'An Error occurred, did you give me a valid warningID?');
-                                        log(res.result)
-                                    } else if(res.code == 0){
-                                        try{
-                                            EmbedMsg(message.channel, 0x00ff00, 'Success', 'You successfully deleted a warning from ' + mention(bot.users.get(res.result[0].warneduserID)));
-                                            log(author.tag + ' deleted a warning from ' + bot.users.get(res.result[0].warneduserID).tag);
-                                        } catch(err){
-                                            EmbedMsg(message.channel, 0x00ff00, 'Success', 'You successfully deleted a warning');
-                                            log(author.tag + ' deleted a warning');
-                                        }
+                                    if(!claimable){
+                                        EmbedMsg(message.channel, 0xff0000, 'Error', 'You can\'t claim this role.');
+                                        log(author.tag + ' tried claiming the role ' + msg[1]);
                                     }
                                 });
 
                             } else {
                                 SendSyntaxErr(message.channel);
                             }
+
                         } else {
-                            SendSyntaxErr(message.channel);
+                            noPerm(message.channel);
                         }
-                    } else {
-                        noPerm(message.channel);
-                    }
 
-                    break;
+                        break;
 
-                case 'joindate':
+                    case 'addclaim':
 
-                    if(userperm >= perms.joindate){
+                        if(userperm >= perms.addclaim){
+                            if(msg.length >= 2){
 
-                        if(msg.length == 2){
-
-                            getMentioned(msg[1], message.guild, function(memb){
-                                if(!memb){
-                                    EmbedMsg(message.channel, 0xff0000, 'Error!', 'I am having trouble finding the specified user. Please mention someone that is on the server.');
-                                } else {
-                                    EmbedMsg(message.channel, 0x0000ff, 'Join Date', memb.user.username + ' joined at:\n' + memb.joinedAt);
+                                var rolename = '';
+                                for(var i = 1; i < msg.length; i++){
+                                    rolename += msg[i] + ' ';
                                 }
-                            });
+                                rolename = rolename.substring(0, rolename.length -1);
+                                rolename = rolename.toLowerCase();
+                                
 
-                        } else if(msg.length == 1){
-                            EmbedMsg(message.channel, 0x0000ff, 'Join Date', author.username + ' joined at:\n' + message.member.joinedAt);
-                        } else {
-                            SendSyntaxErr(message.channel);
-                        }
+                                var success = false;
+                                var counter = 0;
 
-                    } else {
-                        noPerm(message.channel);
-                    }
+                                message.guild.roles.forEach(function(role){
 
-                break;
-
-                case 'role':
-
-                    if(userperm >= perms.role){
-
-                        if(msg.length >= 2){
-
-                            var claimable = false;
-
-                            var rolename = '';
-                            for(var i = 1; i < msg.length; i++){
-                                rolename += msg[i] + ' ';
-                            }
-                            rolename = rolename.substring(0, rolename.length -1);
-
-                            db.data.claimableRoles(message.guild, function(roles){
-                                for(var i = 0; i < roles.result.length; i++){
-                                    if(rolename == roles.result[i].rolename.toLowerCase()){
-                                        if(message.member.roles.get(roles.result[i].roleID)){
-                                            claimable = true;
-                                            log(author.tag + ' tried claiming the role ' + rolename + ', but they already have it...');
-                                            EmbedMsg(message.channel, 0xff0000, 'Role claiming failed', 'You already have this role...');
-                                            break;
-                                        } else {
-                                            claimable = true;
-                                            log(author.tag + ' claimed the role ' + roles.result[i].rolename);
-                                            EmbedMsg(message.channel, 0x00ff00, 'Role claimed!', 'You successfully claimed the role ' + roles.result[i].rolename);
-                                            message.member.addRole(roles.result[i].roleID, 'Claimed by user');
-                                        }
+                                    if(role.name.toLowerCase() == rolename){
+                                        db.data.addClaimable(message.guild, role, function(res){
+                                            success = true;
+                                            log('This was a success!!!');
+                                            counter++;
+                                            claimCounter(counter, success, message, role);
+                                            db.data
+                                        });
+                                    } else {
+                                        counter++;
+                                        claimCounter(counter, success, message);
                                     }
-                                }
-                                if(!claimable){
-                                    EmbedMsg(message.channel, 0xff0000, 'Error', 'You can\'t claim this role.');
-                                    log(author.tag + ' tried claiming the role ' + msg[1]);
-                                }
-                            });
-
+                                });
+                            } else {
+                                SendSyntaxErr(message.channel);
+                            }
                         } else {
-                            SendSyntaxErr(message.channel);
+                            noPerm(message.channel);
                         }
 
-                    } else {
-                        noPerm(message.channel);
-                    }
+                        break;
 
-                    break;
+                    case 'delclaim':
 
-                case 'addclaim':
-
-                    if(userperm >= perms.addclaim){
+                    if(userperm >= perms.delclaim){
                         if(msg.length >= 2){
 
                             var rolename = '';
@@ -495,15 +594,14 @@ bot.on('message', (message) => {
                             message.guild.roles.forEach(function(role){
 
                                 if(role.name.toLowerCase() == rolename){
-                                    db.data.addClaimable(message.guild, role, function(res){
+                                    db.data.delClaimable(message.guild, role, function(res){
                                         success = true;
-                                        log('This was a success!!!');
                                         counter++;
-                                        claimCounter(counter, success, message, role);
+                                        delclaimCounter(counter, success, message, role);
                                     });
                                 } else {
                                     counter++;
-                                    claimCounter(counter, success, message);
+                                    delclaimCounter(counter, success, message);
                                 }
                             });
                         } else {
@@ -513,53 +611,16 @@ bot.on('message', (message) => {
                         noPerm(message.channel);
                     }
 
-                    break;
+                        break;
 
-                case 'delclaim':
+                    default:
 
-                if(userperm >= perms.delclaim){
-                    if(msg.length >= 2){
-
-                        var rolename = '';
-                        for(var i = 1; i < msg.length; i++){
-                            rolename += msg[i] + ' ';
-                        }
-                        rolename = rolename.substring(0, rolename.length -1);
-                        rolename = rolename.toLowerCase();
-                        
-
-                        var success = false;
-                        var counter = 0;
-
-                        message.guild.roles.forEach(function(role){
-
-                            if(role.name.toLowerCase() == rolename){
-                                db.data.delClaimable(message.guild, role, function(res){
-                                    success = true;
-                                    counter++;
-                                    delclaimCounter(counter, success, message, role);
-                                });
-                            } else {
-                                counter++;
-                                delclaimCounter(counter, success, message);
-                            }
-                        });
-                    } else {
-                        SendSyntaxErr(message.channel);
-                    }
-                } else {
-                    noPerm(message.channel);
+                        break;
                 }
 
-                    break;
-
-                default:
-
-                    break;
             }
-
-        }
-    })
+        })
+    }
 });
 
 function getTimeStamp() {
