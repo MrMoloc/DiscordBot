@@ -81,19 +81,11 @@ bot.on('roleUpdate', (oldRole, newRole) => {
 
 bot.on('message', (message) => {
 
-    /*if(message.content == 'ping') {
-        message.reply('pong');
-        message.channel.sendMessage('sfad');
-    }*/
-
-    //if(message.)
-
     if(!message.guild && !message.author.bot){
 
         if(message.author.id == '153276061163978752' || message.author.id == '281109553834229761'){
 
             var msg = message.content.split(" ");
-
             var dmmsg = '';
             for(var i = 2; i < msg.length;i++) {
                 dmmsg += msg[i] + ' ';
@@ -108,6 +100,7 @@ bot.on('message', (message) => {
                     EmbedMsg(bot.users.get("281109553834229761"), 0x00ff00, 'Sent DM to: ' + bot.users.get(msg[1]).tag + '|' + bot.users.get(msg[1]).id, dmmsg);
                 } catch (err){
                     log('non existent userid.');
+                    EmbedMsg(message.author, 0x00ff00, 'Error sending message', 'There was an error sending that message, maybe the bot isn\'t on a server with the user, or you misspelled the userID. 💩');
                 }
             }
 
