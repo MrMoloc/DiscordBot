@@ -554,7 +554,6 @@ bot.on('message', (message) => {
                                     if(role.name.toLowerCase() == rolename){
                                         db.data.addClaimable(message.guild, role, function(res){
                                             success = true;
-                                            log('This was a success!!!');
                                             counter++;
                                             claimCounter(counter, success, message, role);
                                             db.data
@@ -671,7 +670,7 @@ function log(logmsg) {
 function getMentioned(taggeduser, guild, cb) {
     var i = 0;
     guild.members.forEach(function(guildMember, guildMemberId) {
-        if('<@'+guildMemberId+'>' == taggeduser) {
+        if('<@'+guildMemberId+'>' == taggeduser || '<@!'+guildMemberId+'>' == taggeduser) {
             i++;
             cb(guildMember);
         }
