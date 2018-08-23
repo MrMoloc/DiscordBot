@@ -33,7 +33,8 @@ var methods = {
     getWarn: function(member, cb) {
 
         // DB Abfrage: Alle Warnings von einem Meber einer Guild
-        con.query('SELECT * FROM warning WHERE warneduserID = ' + member.id + ' AND guildID = ' + member.guild.id, function (err, result) {
+        //con.query('SELECT * FROM warning WHERE warneduserID = ' + member.id + ' AND guildID = ' + member.guild.id, function (err, result) {
+        con.query('SELECT w.warningID, w.issuerID, w.creationtime, w.deletiontime, w.deletedbyuserID, w.warningtext, u.username AS issuerName FROM warning AS w, user AS u WHERE w.warneduserID = ? AND w.guildID = ? AND w.issuerID = u.userID', [member.id, member.guild.id], function(err, result){
             
             //Code zeugs zurückgeben
             if(err) {

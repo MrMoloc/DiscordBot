@@ -331,7 +331,7 @@ bot.on('message', (message) => {
                                                             if(res.result[i].deletiontime != null) {
                                                                 fields.push({
                                                                     name: '__Warning ID '+res.result[i].warningID+'__',
-                                                                    value: '~~Warning from:\t'+bot.users.get(res.result[i].issuerID).username
+                                                                    value: '~~Warning from:\t'+res.result[i].issuerName
                                                                     + '\nWarning text:\t'+res.result[i].warningtext
                                                                     + '\nIssued at:\t'+res.result[i].creationtime+'~~'
                                                                     + '\nDeleted at:\t'+res.result[i].deletiontime
@@ -341,7 +341,7 @@ bot.on('message', (message) => {
                                                                 // Wenn Warning nicht gelöscht, dann einfach zum Array hinzufügen
                                                                 fields.push({
                                                                     name: '__Warning ID '+res.result[i].warningID+'__',
-                                                                    value: 'Warning from:\t'+bot.users.get(res.result[i].issuerID).username
+                                                                    value: 'Warning from:\t'+res.result[i].issuerName
                                                                     + '\nWarning text:\t'+res.result[i].warningtext
                                                                     + '\nIssued at:\t'+res.result[i].creationtime
                                                                 });
