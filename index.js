@@ -532,6 +532,7 @@ bot.on('message', (message) => {
                                             }
                                         }
                                     }
+                                    log('claimable: ' + claimable);
                                     if(!claimable){
                                         EmbedMsg(message.channel, 0xff0000, 'Error', 'You can\'t claim this role.');
                                         log(author.tag + ' tried claiming the role ' + msg[1]);
