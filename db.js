@@ -49,47 +49,51 @@ var methods = {
     getPermLvl: function(member, cb) {
 
         // Abfrage nach PermissionsLevel von einem User auf einer Guild
-        con.query('SELECT permlvl FROM useringuild WHERE userID = ' + member.id + ' AND guildID = ' + member.guild.id, function (err, result) {
+        try{
+            con.query('SELECT permlvl FROM useringuild WHERE userID = ' + member.id + ' AND guildID = ' + member.guild.id, function (err, result) {
 
-            if(err || typeof result[0] === 'undefined' ) {
-                cb({code: 1, result: err});
-                return;
-            }
-
-            if(result[0].permlvl > 1){
-
-                if(err) {
+                if(err || typeof result[0] === 'undefined' ) {
                     cb({code: 1, result: err});
-                } else {
-                    cb({code: 0, result: result[0].permlvl});
+                    return;
                 }
-
-            } else {
-                
-                con.query('SELECT * FROM roles WHERE permlvl > 1 AND guildID = ?', member.guild.id, function(err, res){
-                    var maxperm = 1;
-
-                    for(var i = 0; i < res.length; i++){
-                        member.roles.forEach(function(role){
-                            if(role.id == res[i].roleID){
-                                if(res[i].permlvl > maxperm){
-                                    maxperm = res[i].permlvl;
-                                }
-                            }
-                        })
-                    }
-
+    
+                if(result[0].permlvl > 1){
+    
                     if(err) {
                         cb({code: 1, result: err});
                     } else {
-                        cb({code: 0, result: maxperm});
+                        cb({code: 0, result: result[0].permlvl});
                     }
-
-                });
-                
-            }
-
-        });
+    
+                } else {
+                    
+                    con.query('SELECT * FROM roles WHERE permlvl > 1 AND guildID = ?', member.guild.id, function(err, res){
+                        var maxperm = 1;
+    
+                        for(var i = 0; i < res.length; i++){
+                            member.roles.forEach(function(role){
+                                if(role.id == res[i].roleID){
+                                    if(res[i].permlvl > maxperm){
+                                        maxperm = res[i].permlvl;
+                                    }
+                                }
+                            })
+                        }
+    
+                        if(err) {
+                            cb({code: 1, result: err});
+                        } else {
+                            cb({code: 0, result: maxperm});
+                        }
+    
+                    });
+                    
+                }
+    
+            });
+        } catch(error){
+            log(error);
+        }
 
     },
 
