@@ -515,6 +515,7 @@ bot.on('message', (message) => {
                                     rolename += msg[i] + ' ';
                                 }
                                 rolename = rolename.substring(0, rolename.length -1);
+                                rolename = rolename.toLowerCase();
 
                                 db.data.claimableRoles(message.guild, function(roles){
                                     for(var i = 0; i < roles.result.length; i++){
@@ -532,7 +533,6 @@ bot.on('message', (message) => {
                                             }
                                         }
                                     }
-                                    log('claimable: ' + claimable);
                                     if(!claimable){
                                         EmbedMsg(message.channel, 0xff0000, 'Error', 'You can\'t claim this role.');
                                         log(author.tag + ' tried claiming the role ' + msg[1]);
