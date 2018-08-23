@@ -88,44 +88,59 @@ bot.on('message', (message) => {
 
     if(!message.guild && !message.author.bot){
 
-        if(message.author.id == '153276061163978752' || message.author.id == '281109553834229761'){
+        var botadmins = ['153276061163978752', '281109553834229761'];
 
-            var msg = message.content.split(" ");
-            var dmmsg = '';
-            for(var i = 2; i < msg.length;i++) {
-                dmmsg += msg[i] + ' ';
-            }
-            dmmsg = dmmsg.substring(0, dmmsg.length -1);
-            
-            if(msg[0].toLowerCase() == 'dm'){
-                try{
-                    bot.users.get(msg[1]).send(dmmsg);
-                    log('Message sent to ' + bot.users.get(msg[1]).tag + ': ' + dmmsg);
-                    EmbedMsg(bot.users.get("153276061163978752"), 0x00ff00, 'Sent DM to: ' + bot.users.get(msg[1]).tag + '|' + bot.users.get(msg[1]).id, dmmsg);
-                    EmbedMsg(bot.users.get("281109553834229761"), 0x00ff00, 'Sent DM to: ' + bot.users.get(msg[1]).tag + '|' + bot.users.get(msg[1]).id, dmmsg);
-                } catch (err){
-                    log('non existent userid.');
-                    EmbedMsg(message.author, 0x00ff00, 'Error sending message', 'There was an error sending that message, maybe the bot isn\'t on a server with the user, or you misspelled the userID. 💩');
+        for(var i = 0; i < botadmins.length; i++){
+            if(message.author.id == botadmins[i]){
+
+                var msg = message.content.split(" ");
+                var dmmsg = '';
+                for(var i = 2; i < msg.length;i++) {
+                    dmmsg += msg[i] + ' ';
                 }
+                dmmsg = dmmsg.substring(0, dmmsg.length -1);
+                
+                if(msg[0].toLowerCase() == 'dm'){
+                    try{
+                        bot.users.get(msg[1]).send(dmmsg);
+                        log('Message sent to ' + bot.users.get(msg[1]).tag + ': ' + dmmsg);
+                        for(var j = 0; j < botadmins.length; j++){
+                            EmbedMsg(bot.users.get(botadmins[j]), 0x00ff00, 'Sent DM to: ' + bot.users.get(msg[1]).tag + '|' + bot.users.get(msg[1]).id, dmmsg);
+                        }
+                    } catch (err){
+                        log('non existent userid.');
+                        EmbedMsg(message.author, 0x00ff00, 'Error sending message', 'There was an error sending that message, maybe the bot isn\'t on a server with the user, or you misspelled the userID. 💩');
+                    }
+                }
+    
             }
-
         }
 
-        if(message.author.id != '153276061163978752' && message.author.id != '281109553834229761'){
+        var authisadmin = false;
+        for(var j = 0; j < botadmins.length; j++){
+            if(message.author.id == botadmins[j]){
+                authisadmin = true;
+            }
+        }
+
+        if(!authisadmin){
             if(message.attachments.size > 0){
                 message.attachments.forEach(MessageAttachement => {
-                    bot.users.get('153276061163978752').send(MessageAttachement.url);
-                    bot.users.get('281109553834229761').send(MessageAttachement.url);
+                    botadmins.forEach(function(adminid){
+                        bot.users.get(adminid).send(MessageAttachement.url);
+                    });
                     log('Message from ' + message.author.tag + ': ' + MessageAttachement.url);
                     if(message.content){
-                        EmbedMsg(bot.users.get("153276061163978752"), 0x00ff00, '(attachement) DM from ' + message.author.tag + '|' + message.author.id, message.content);
-                        EmbedMsg(bot.users.get("281109553834229761"), 0x00ff00, '(attachement) DM from ' + message.author.tag + '|' + message.author.id, message.content);
+                        botadmins.forEach(function(adminid){
+                            EmbedMsg(bot.users.get(adminid), 0x00ff00, '(attachement) DM from ' + message.author.tag + '|' + message.author.id, message.content);
+                        });
                         log('Message from ' + message.author.tag + ': ' + message.content);
                     }
                 });
             } else {
-                EmbedMsg(bot.users.get("153276061163978752"), 0x00ff00, 'DM from ' + message.author.tag + '|' + message.author.id, message.content);
-                EmbedMsg(bot.users.get("281109553834229761"), 0x00ff00, 'DM from ' + message.author.tag + '|' + message.author.id, message.content);
+                botadmins.forEach(function(adminid){
+                    EmbedMsg(bot.users.get(adminid), 0x00ff00, 'DM from ' + message.author.tag + '|' + message.author.id, message.content);
+                });
                 log('Message from ' + message.author.tag + ': ' + message.content);
             }
         }
