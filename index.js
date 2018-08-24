@@ -22,7 +22,7 @@ var perms = {
 bot.login(key.data);
 bot.on('ready', () => {
 
-    console.log('Logged in as ' + bot.user.tag + '!');
+    log('Logged in as ' + bot.user.tag + '!');
     bot.guilds.forEach(function(guild, guildID) {
         db.data.updateGuild(guild);
         // guild.roles.forEach(function(role, roleID) {
