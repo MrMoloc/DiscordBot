@@ -309,7 +309,7 @@ bot.on('message', (message) => {
                                                                         EmbedMsg(message.channel, 0x00ff00, 'Success!', 'You successfully warned ' + mention(warnedUser) + ' for: ' + warnreason + '\nThe user also has been auto-banned, since he reached ' + counts.ban + ' warnings.');
                                                                         EmbedMsg(message.guild.channels.get(res.result), 0x00ff00, 'Autoban issued', mention(warnedUser.user) + ' has been banned automatically because he reached ' + counts.ban + ' warnings.');
                                                                         log(warnedUser.user.tag + ' has been autobanned');
-                                                                    //});
+                                                                    });
                                                                 } else if(warncount == counts.kick){
                                                                     warnedUser.kick('Kicked automatically: Max warns.').then(function(){
                                                                         EmbedMsg(message.channel, 0x00ff00, 'Success!', 'You successfully warned ' + mention(warnedUser) + ' for: ' + warnreason + '\nThe user also has been auto-kicked, since he reached ' + counts.kick + ' warnings.');
