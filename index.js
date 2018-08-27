@@ -18,6 +18,11 @@ var perms = {
     delclaim: 4
 }
 
+var counts = {
+    kick: 3,
+    ban: 5
+}
+
 
 bot.login(key.data);
 bot.on('ready', () => {
@@ -236,7 +241,7 @@ bot.on('message', (message) => {
                     //?warn
                     case "warn":
                         if(userperm >= perms.warn){
-                            if(msg.length >= 3) {   // ?warn <@1234567889> Grund
+                            if(msg.length >= 3) {   // ?warn <@123456789> Grund
 
                                 // get mentioned User
                                 getMentioned(msg[1], message.guild, function(warnedUser) {
@@ -248,29 +253,86 @@ bot.on('message', (message) => {
                                         return;
                                     }
 
-                                    // Warnreason zusammensetzen aus den Argumenten/Wörtern
-                                    var warnreason = '';
-                                    for(var i = 2; i < msg.length;i++) {
-                                        warnreason += msg[i] + ' ';
-                                    }
-                                    warnreason = warnreason.substring(0, warnreason.length -1);
+                                    if(warnedUser) {
 
-                                    // Die Warnung in die DB schreiben
-                                    db.data.newWarn(warnedUser, author, warnreason, function(resu) {
-                                        if(resu.code == 1) {
-                                            // Wenn Fehler auftritt (Code 1) Fehlermeldung ausgeben und Benutzer informieren.
-                                            EmbedMsg(message.channel, 0xff0000, 'Error!', 'An Error occured, please contact an Admin. Or don\'t, I\'m a bot not a cop.');
-                                            // Mich per DM informieren, dass etwas mit der DB nicht stimmt.
-                                            EmbedMsg(bot.users.get("153276061163978752"), 0x0000ff, 'DB broke', 'The DB broke or something I\'m sorry senpai');
-                                        } else {
-                                            // Erfolg, den Benutzer informieren und Logging in die Konsole.
-                                            EmbedMsg(message.channel, 0x00ff00, 'Success!', 'You successfully warned ' + mention(warnedUser) + ' for: ' + warnreason);
-                                            db.data.getWarnLog(message.guild, function(res){
-                                                EmbedMsg(message.guild.channels.get(res.result), 0x0000ff, 'Warning issued', mention(author) + ' warned the user ' + mention(warnedUser.user) + ' for the reason:\n' + warnreason);
-                                            });
-                                            log(author.tag + ' warned ' + warnedUser.user.tag);
-                                        }
-                                    });
+                                        // Die Warning aus der DB holen
+                                        db.data.getWarn(warnedUser, function(res) {
+
+                                            var warncount = 0;
+
+                                            if(res.code == 0) {
+                                                var fields = [];
+                                                if(res.result.length == 0){
+
+                                                    //no warnings
+
+                                                } else {
+
+                                                    for(var i = 0; i < res.result.length; i++) {
+
+                                                        //für jeden warn
+                                                        if(!res.result[i].deletiontime){
+                                                            warncount++;
+                                                        }
+
+                                                        /*name: '__Warning ID '+res.result[i].warningID+'__',
+                                                                value: '~~Warning from:\t'+res.result[i].issuerName
+                                                                + '\nWarning text:\t'+res.result[i].warningtext
+                                                                + '\nIssued at:\t'+res.result[i].creationtime+'~~'
+                                                                + '\nDeleted at:\t'+res.result[i].deletiontime
+                                                                + '\nDeleted from:\t'+bot.users.get(res.result[i].deletedbyuserID).username*/
+                
+                                                    }
+
+                                                    // Warnreason zusammensetzen aus den Argumenten/Wörtern
+                                                    var warnreason = '';
+                                                    for(var i = 2; i < msg.length;i++) {
+                                                        warnreason += msg[i] + ' ';
+                                                    }
+                                                    warnreason = warnreason.substring(0, warnreason.length -1);
+
+                                                    // Die Warnung in die DB schreiben
+                                                    db.data.newWarn(warnedUser, author, warnreason, function(resu) {
+                                                        if(resu.code == 1) {
+                                                            // Wenn Fehler auftritt (Code 1) Fehlermeldung ausgeben und Benutzer informieren.
+                                                            EmbedMsg(message.channel, 0xff0000, 'Error!', 'An Error occured, please contact an Admin. Or don\'t, I\'m a bot not a cop.');
+                                                            // Mich per DM informieren, dass etwas mit der DB nicht stimmt.
+                                                            EmbedMsg(bot.users.get("153276061163978752"), 0x0000ff, 'DB broke', 'The DB broke or something I\'m sorry senpai');
+                                                        } else {
+                                                            // Erfolg, den Benutzer informieren und Logging in die Konsole.
+                                                            EmbedMsg(message.channel, 0x00ff00, 'Success!', 'You successfully warned ' + mention(warnedUser) + ' for: ' + warnreason);
+                                                            db.data.getWarnLog(message.guild, function(res){
+                                                                EmbedMsg(message.guild.channels.get(res.result), 0x0000ff, 'Warning issued', mention(author) + ' warned the user ' + mention(warnedUser.user) + ' for the reason:\n' + warnreason);
+                                                                if(warncount >= counts.ban){
+                                                                    warnedUser.ban('Banned automatically: Max warns.', function(){
+                                                                        EmbedMsg(message.guild.channels.get(res.result), 0x00ff00, 'Autoban issued', mention(warnedUser.user) + ' has been banned automatically because he reached ' + counts.ban + ' warnings.');
+                                                                        log(warnedUser.user.tag + ' has been autobanned');
+                                                                    });
+                                                                } else if(warncount >= counts.kick){
+                                                                    warnedUser.ban('Kicked automatically: Max warns.', function(){
+                                                                        EmbedMsg(message.guild.channels.get(res.result), 0x00ff00, 'AutoKick issued', mention(warnedUser.user) + ' has been kicked automatically because he reached ' + counts.kick + ' warnings.');
+                                                                        log(warnedUser.user.tag + ' has been autokicked');
+                                                                    });
+                                                                }
+                                                            });
+                                                            log(author.tag + ' warned ' + warnedUser.user.tag);
+                                                        }
+                                                    });
+
+                                                }
+
+                                            } else { // Wenn DB anfrage nicht OK Benutzer informieren, loggen und Admin informieren.
+                                                EmbedMsg(message.channel, 0xff0000, 'An Error occured', 'A Database error occured, you should probably ask an admin to fix it');
+                                                outerr(res.result.sqlMessage);
+                                                EmbedMsg(bot.users.get("153276061163978752"), 0x0000ff, 'DB broke', 'The DB broke or something I\'m sorry senpai');
+                                            }
+
+                                        });
+
+                                    } else {
+                                        // Wenn der gesuchte Benutzer nicht gefunden werden konnte.
+                                        EmbedMsg(message.channel, 0xff0000, 'Error!', 'I am having trouble finding the specified user. Please mention someone that is on the server.');
+                                    }
 
                                 });
 
