@@ -506,7 +506,7 @@ bot.on('message', (message) => {
                                                     var mod = fields.length % 10;
                                                     var messagecount = ((fields.length - mod) / 10) + 1;
                                                     for(var i = 0; i < messagecount; i++){
-                                                        var newfields;
+                                                        var newfields = [];
                                                         for(var j = 0; j < 10; j++){
                                                             var temp = i*10+j;
                                                             if(fields[temp].name){
