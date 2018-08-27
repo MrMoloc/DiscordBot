@@ -262,9 +262,33 @@ bot.on('message', (message) => {
 
                                             if(res.code == 0) {
                                                 var fields = [];
+
+                                                // Warnreason zusammensetzen aus den Argumenten/Wörtern
+                                                var warnreason = '';
+                                                for(var i = 2; i < msg.length;i++) {
+                                                    warnreason += msg[i] + ' ';
+                                                }
+                                                warnreason = warnreason.substring(0, warnreason.length -1);
+
                                                 if(res.result.length == 0){
 
                                                     //no warnings
+                                                    // Die Warnung in die DB schreiben
+                                                    db.data.newWarn(warnedUser, author, warnreason, function(resu) {
+                                                        if(resu.code == 1) {
+                                                            // Wenn Fehler auftritt (Code 1) Fehlermeldung ausgeben und Benutzer informieren.
+                                                            EmbedMsg(message.channel, 0xff0000, 'Error!', 'An Error occured, please contact an Admin. Or don\'t, I\'m a bot not a cop.');
+                                                            // Mich per DM informieren, dass etwas mit der DB nicht stimmt.
+                                                            EmbedMsg(bot.users.get("153276061163978752"), 0x0000ff, 'DB broke', 'The DB broke or something I\'m sorry senpai');
+                                                        } else {
+                                                            // Erfolg, den Benutzer informieren und Logging in die Konsole.
+                                                            EmbedMsg(message.channel, 0x00ff00, 'Success!', 'You successfully warned ' + mention(warnedUser) + ' for: ' + warnreason);
+                                                            db.data.getWarnLog(message.guild, function(res){
+                                                                EmbedMsg(message.guild.channels.get(res.result), 0x0000ff, 'Warning issued', mention(author) + ' warned the user ' + mention(warnedUser.user) + ' for the reason:\n' + warnreason);
+                                                            });
+                                                            log(author.tag + ' warned ' + warnedUser.user.tag);
+                                                        }
+                                                    });
 
                                                 } else {
 
@@ -283,13 +307,6 @@ bot.on('message', (message) => {
                                                                 + '\nDeleted from:\t'+bot.users.get(res.result[i].deletedbyuserID).username*/
                 
                                                     }
-
-                                                    // Warnreason zusammensetzen aus den Argumenten/Wörtern
-                                                    var warnreason = '';
-                                                    for(var i = 2; i < msg.length;i++) {
-                                                        warnreason += msg[i] + ' ';
-                                                    }
-                                                    warnreason = warnreason.substring(0, warnreason.length -1);
 
                                                     // Die Warnung in die DB schreiben
                                                     db.data.newWarn(warnedUser, author, warnreason, function(resu) {
@@ -479,19 +496,44 @@ bot.on('message', (message) => {
                                                 });
                                             }
 
+
                                             // Ein bisschen cheaty das so zu machen, bin aber zu faul es anders zu machen
                                             // Es wird bei jedem Iterieren countermem um eins hochgezählt und wenn es so gross ist wie
                                             // Die Anzahl an Membern im Server wird die Embedded Message ausgegeben mit der Anzahl an Warnings
                                             countermem++;
                                             if(countermem === message.guild.members.size) {
-                                                var emb = {
-                                                    embed: {
-                                                        color: 0x0000ff,
-                                                        title: 'Warnings for all the users:',
-                                                        fields: fields
+                                                if(fields.length > 10){
+                                                    var mod = fields.length % 10;
+                                                    var messagecount = ((fields.length - mod) / 10) + 1;
+                                                    for(var i = 0; i < messagecount; i++){
+                                                        var newfields;
+                                                        for(var j = 0; j < 10; j++){
+                                                            var temp = i*10+j;
+                                                            if(fields[temp].name){
+                                                                newfields[j] = fields[temp];
+                                                            }
+                                                        }
+                                                        newfields.forEach(function(nf){
+                                                            var emb = {
+                                                                embed: {
+                                                                    color: 0x0000ff,
+                                                                    title: 'Warnings for all the users:',
+                                                                    fields: nf
+                                                                }
+                                                            }
+                                                            message.channel.send(emb);
+                                                        })
                                                     }
+                                                } else{
+                                                    var emb = {
+                                                        embed: {
+                                                            color: 0x0000ff,
+                                                            title: 'Warnings for all the users:',
+                                                            fields: fields
+                                                        }
+                                                    }
+                                                    message.channel.send(emb);
                                                 }
-                                                message.channel.send(emb);
                                             }
 
                                         } else {    // Wenn DB Abfrage nicht OK user informieren, etc, etc, bla, bla, bla
