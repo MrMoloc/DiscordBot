@@ -272,7 +272,7 @@ bot.on('message', (message) => {
 
                                                         //für jeden warn
                                                         if(!res.result[i].deletiontime){
-                                                            warncount++;
+                                                            ++warncount;
                                                         }
 
                                                         /*name: '__Warning ID '+res.result[i].warningID+'__',
@@ -293,6 +293,7 @@ bot.on('message', (message) => {
 
                                                     // Die Warnung in die DB schreiben
                                                     db.data.newWarn(warnedUser, author, warnreason, function(resu) {
+                                                        ++warncount;
                                                         if(resu.code == 1) {
                                                             // Wenn Fehler auftritt (Code 1) Fehlermeldung ausgeben und Benutzer informieren.
                                                             EmbedMsg(message.channel, 0xff0000, 'Error!', 'An Error occured, please contact an Admin. Or don\'t, I\'m a bot not a cop.');
@@ -300,19 +301,21 @@ bot.on('message', (message) => {
                                                             EmbedMsg(bot.users.get("153276061163978752"), 0x0000ff, 'DB broke', 'The DB broke or something I\'m sorry senpai');
                                                         } else {
                                                             // Erfolg, den Benutzer informieren und Logging in die Konsole.
-                                                            EmbedMsg(message.channel, 0x00ff00, 'Success!', 'You successfully warned ' + mention(warnedUser) + ' for: ' + warnreason);
+                                                            //EmbedMsg(message.channel, 0x00ff00, 'Success!', 'You successfully warned ' + mention(warnedUser) + ' for: ' + warnreason);
                                                             db.data.getWarnLog(message.guild, function(res){
                                                                 EmbedMsg(message.guild.channels.get(res.result), 0x0000ff, 'Warning issued', mention(author) + ' warned the user ' + mention(warnedUser.user) + ' for the reason:\n' + warnreason);
-                                                                if(warncount >= counts.ban){
-                                                                    warnedUser.ban('Banned automatically: Max warns.').then(function(){
+                                                                if(warncount == counts.ban){
+                                                                    /*warnedUser.ban('Banned automatically: Max warns.').then(function(){*/
+                                                                        EmbedMsg(message.channel, 0x00ff00, 'Success!', 'You successfully warned ' + mention(warnedUser) + ' for: ' + warnreason + '\nThe user also has been auto-banned, since he reached ' + counts.ban + ' warnings.');
                                                                         EmbedMsg(message.guild.channels.get(res.result), 0x00ff00, 'Autoban issued', mention(warnedUser.user) + ' has been banned automatically because he reached ' + counts.ban + ' warnings.');
                                                                         log(warnedUser.user.tag + ' has been autobanned');
-                                                                    });
-                                                                } else if(warncount >= counts.kick){
-                                                                    warnedUser.kick('Kicked automatically: Max warns.').then(function(){
+                                                                    //});
+                                                                } else if(warncount == counts.kick){
+                                                                    //warnedUser.kick('Kicked automatically: Max warns.').then(function(){
+                                                                        EmbedMsg(message.channel, 0x00ff00, 'Success!', 'You successfully warned ' + mention(warnedUser) + ' for: ' + warnreason + '\nThe user also has been auto-kicked, since he reached ' + counts.kick + ' warnings.');
                                                                         EmbedMsg(message.guild.channels.get(res.result), 0x00ff00, 'AutoKick issued', mention(warnedUser.user) + ' has been kicked automatically because he reached ' + counts.kick + ' warnings.');
                                                                         log(warnedUser.user.tag + ' has been autokicked');
-                                                                    });
+                                                                    //});
                                                                 }
                                                             });
                                                             log(author.tag + ' warned ' + warnedUser.user.tag);
