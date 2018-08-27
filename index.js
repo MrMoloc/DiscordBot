@@ -305,17 +305,17 @@ bot.on('message', (message) => {
                                                             db.data.getWarnLog(message.guild, function(res){
                                                                 EmbedMsg(message.guild.channels.get(res.result), 0x0000ff, 'Warning issued', mention(author) + ' warned the user ' + mention(warnedUser.user) + ' for the reason:\n' + warnreason);
                                                                 if(warncount == counts.ban){
-                                                                    /*warnedUser.ban('Banned automatically: Max warns.').then(function(){*/
+                                                                    warnedUser.ban('Banned automatically: Max warns.').then(function(){
                                                                         EmbedMsg(message.channel, 0x00ff00, 'Success!', 'You successfully warned ' + mention(warnedUser) + ' for: ' + warnreason + '\nThe user also has been auto-banned, since he reached ' + counts.ban + ' warnings.');
                                                                         EmbedMsg(message.guild.channels.get(res.result), 0x00ff00, 'Autoban issued', mention(warnedUser.user) + ' has been banned automatically because he reached ' + counts.ban + ' warnings.');
                                                                         log(warnedUser.user.tag + ' has been autobanned');
                                                                     //});
                                                                 } else if(warncount == counts.kick){
-                                                                    //warnedUser.kick('Kicked automatically: Max warns.').then(function(){
+                                                                    warnedUser.kick('Kicked automatically: Max warns.').then(function(){
                                                                         EmbedMsg(message.channel, 0x00ff00, 'Success!', 'You successfully warned ' + mention(warnedUser) + ' for: ' + warnreason + '\nThe user also has been auto-kicked, since he reached ' + counts.kick + ' warnings.');
                                                                         EmbedMsg(message.guild.channels.get(res.result), 0x00ff00, 'AutoKick issued', mention(warnedUser.user) + ' has been kicked automatically because he reached ' + counts.kick + ' warnings.');
                                                                         log(warnedUser.user.tag + ' has been autokicked');
-                                                                    //});
+                                                                    });
                                                                 }
                                                             });
                                                             log(author.tag + ' warned ' + warnedUser.user.tag);
