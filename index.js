@@ -95,8 +95,6 @@ bot.on('message', (message) => {
 
         var botadmins = ['153276061163978752', '281109553834229761'];
 
-        
-
         for(var i = 0; i < botadmins.length; i++){
             if(message.author.id == botadmins[i]){
 
@@ -168,10 +166,12 @@ bot.on('message', (message) => {
             var msg = message.content.split(" ");
             var cmd = msg[0];
 
-            // Verbotene Wörter einfach löschen
+            //DM bei mention
             if(message.content.toLowerCase().indexOf('moloc') + 1) {
                 EmbedMsg(bot.users.get("153276061163978752"), 0x00ff00, 'You were mentioned', 'You were mentioned in the Server ' + message.guild.name + ' in the channel ' + message.channel.name);
             }
+
+            // Verbotene Wörter einfach löschen
             badwords.bw.forEach(word => {
                 if(message.content.indexOf(word) + 1) {
                     message.delete();
@@ -514,20 +514,18 @@ bot.on('message', (message) => {
                                                         var newfields = [];
                                                         for(var j = 0; j < 10; j++){
                                                             var temp = i*10+j;
-                                                            if(fields[temp].name){
+                                                            if(fields[temp] != undefined && fields[temp].name != undefined){
                                                                 newfields[j] = fields[temp];
                                                             }
                                                         }
-                                                        newfields.forEach(function(nf){
-                                                            var emb = {
-                                                                embed: {
-                                                                    color: 0x0000ff,
-                                                                    title: 'Warnings for all the users:',
-                                                                    fields: nf
-                                                                }
+                                                        var emb = {
+                                                            embed: {
+                                                                color: 0x0000ff,
+                                                                title: 'Warnings for all the users:',
+                                                                fields: newfields
                                                             }
-                                                            message.channel.send(emb);
-                                                        })
+                                                        }
+                                                        message.channel.send(emb);
                                                     }
                                                 } else{
                                                     var emb = {
