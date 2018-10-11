@@ -95,6 +95,8 @@ bot.on('message', (message) => {
 
         var botadmins = ['153276061163978752', '281109553834229761'];
 
+        
+
         for(var i = 0; i < botadmins.length; i++){
             if(message.author.id == botadmins[i]){
 
@@ -167,6 +169,9 @@ bot.on('message', (message) => {
             var cmd = msg[0];
 
             // Verbotene Wörter einfach löschen
+            if(message.content.toLowerCase().indexOf('moloc') + 1) {
+                EmbedMsg(bot.users.get("153276061163978752"), 0x00ff00, 'You were mentioned', 'You were mentioned in the Server ' + message.guild.name + ' in the channel ' + message.channel.name);
+            }
             badwords.bw.forEach(word => {
                 if(message.content.indexOf(word) + 1) {
                     message.delete();
