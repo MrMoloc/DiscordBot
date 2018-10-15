@@ -831,7 +831,7 @@ function getName(member, cb) {
 }
 
 function noPerm(channel){
-    EmbedMsg(channel, 0xff0000, 'Insufficient Permissions', 'You don\' have the permissions required to use this command, if you think this is a mistake contact an admin');
+    EmbedMsg(channel, 0xff0000, 'Insufficient Permissions', 'You don\'t have the permissions required to use this command, if you think this is a mistake contact an admin');
 }
 
 function claimCounter(counter, success, message, role){
