@@ -125,12 +125,27 @@ var methods = {
         
     },
 
+    getRule: function(rulename, guildID, cb){
+        
+        con.query('SELECT * FROM rules WHERE guildID = ? AND ruleindex = ?', [guildID, rulename], function(err, res){
+
+            if(err || typeof res[0] === 'undefined' ) {
+                cb({code: 1, result: err});
+                return;
+            } else {
+                cb({code: 0, result: res});
+            }
+            
+        });
+        
+    },
+
     updateGuild: function(guild) {
 
             // Hole eine Guilde
             con.query('SELECT * FROM guild WHERE guildID = ' + guild.id, function (err, result) {
 
-                if(err)throw err; // TODO: umbauenm mit callback, dass abgefangen werden kann in index.js
+                if(err)throw err; // TODO: umbauen mit callback, dass abgefangen werden kann in index.js
                 
                 // Wenn diese Guild nicht existiert in der DB
                 if(result[0] == null) {

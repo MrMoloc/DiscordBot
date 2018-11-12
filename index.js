@@ -15,7 +15,8 @@ var perms = {
     joindate: 1,
     role: 1,
     addclaim: 4,
-    delclaim: 4
+    delclaim: 4,
+    rule: 1
 }
 
 var counts = {
@@ -166,7 +167,7 @@ bot.on('message', (message) => {
             var msg = message.content.split(" ");
             var cmd = msg[0];
 
-            //DM bei mention
+            //DM bei mention //wer das liest ist doof lmao
             if(message.content.toLowerCase().indexOf('moloc') + 1) {
                 EmbedMsg(bot.users.get("153276061163978752"), 0x00ff00, 'You were mentioned', 'You were mentioned in the Server ' + message.guild.name + ' in the channel ' + message.channel.name);
             }
@@ -219,6 +220,9 @@ bot.on('message', (message) => {
                                 },{
                                     name: 'joindate',
                                     value: 'Syntax: `?joindate [@user]`\nDescription: Returns the date and time someone last joined this Discord.'
+                                },{
+                                    name: 'rule',
+                                    value: 'Syntax: `?rule rulename`\nDescription: shows one rule.'
                                 }]
                             }
                         });
@@ -235,13 +239,13 @@ bot.on('message', (message) => {
                         }
                         break;
 
-                    case 'test':
+                    /*case 'test':
                         if(userperm >= perms.test){
                             EmbedMsg(message.channel, 0x0000ff, 'Warning issued', mention(author) + ' warned the user ' + mention(author) + ' for the reason:\n He\'s a lol LMAO');
                         } else {
                             noPerm(message.channel);
                         }
-                        break;
+                        break;*/
 
                     //?warn
                     case "warn":
@@ -700,39 +704,62 @@ bot.on('message', (message) => {
 
                     case 'delclaim':
 
-                    if(userperm >= perms.delclaim){
-                        if(msg.length >= 2){
+                        if(userperm >= perms.delclaim){
+                            if(msg.length >= 2){
 
-                            var rolename = '';
-                            for(var i = 1; i < msg.length; i++){
-                                rolename += msg[i] + ' ';
-                            }
-                            rolename = rolename.substring(0, rolename.length -1);
-                            rolename = rolename.toLowerCase();
-                            
-
-                            var success = false;
-                            var counter = 0;
-
-                            message.guild.roles.forEach(function(role){
-
-                                if(role.name.toLowerCase() == rolename){
-                                    db.data.delClaimable(message.guild, role, function(res){
-                                        success = true;
-                                        counter++;
-                                        delclaimCounter(counter, success, message, role);
-                                    });
-                                } else {
-                                    counter++;
-                                    delclaimCounter(counter, success, message);
+                                var rolename = '';
+                                for(var i = 1; i < msg.length; i++){
+                                    rolename += msg[i] + ' ';
                                 }
-                            });
+                                rolename = rolename.substring(0, rolename.length -1);
+                                rolename = rolename.toLowerCase();
+                                
+
+                                var success = false;
+                                var counter = 0;
+
+                                message.guild.roles.forEach(function(role){
+
+                                    if(role.name.toLowerCase() == rolename){
+                                        db.data.delClaimable(message.guild, role, function(res){
+                                            success = true;
+                                            counter++;
+                                            delclaimCounter(counter, success, message, role);
+                                        });
+                                    } else {
+                                        counter++;
+                                        delclaimCounter(counter, success, message);
+                                    }
+                                });
+                            } else {
+                                SendSyntaxErr(message.channel);
+                            }
+                        } else {
+                            noPerm(message.channel);
+                        }
+
+                        break;
+
+                    case 'rule':
+                    if(userperm >= perms.rule){
+                        if(msg.length == 2){
+
+                            db.data.getRule(msg[1], message.guild.id, function(res){
+                                if(res.code == 0){
+                                    EmbedMsg(message.channel, 0x0000ff, 'Rule ' + msg[1], res.result[0].rule);
+                                } else if(res.code == 1) {
+                                    EmbedMsg(message.channel, 0xff0000, 'Not found', 'I couldn\'t find the rule you specified');
+                                }
+                                
+                            })
+
                         } else {
                             SendSyntaxErr(message.channel);
                         }
                     } else {
                         noPerm(message.channel);
                     }
+                        
 
                         break;
 
