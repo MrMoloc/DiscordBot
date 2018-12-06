@@ -90,6 +90,8 @@ bot.on('roleUpdate', (oldRole, newRole) => {
     db.data.updateRole(newRole, 'update');
 })
 
+client.on('error', console.error);
+
 bot.on('message', (message) => {
 
     if(!message.guild && !message.author.bot){
