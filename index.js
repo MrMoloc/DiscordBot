@@ -90,7 +90,9 @@ bot.on('roleUpdate', (oldRole, newRole) => {
     db.data.updateRole(newRole, 'update');
 })
 
-bot.on('error', console.error);
+bot.on('error', (err) => {
+    console.error(getTimeStamp + " " + err);
+});
 
 bot.on('message', (message) => {
 
