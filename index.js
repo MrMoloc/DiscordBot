@@ -98,7 +98,7 @@ bot.on('message', (message) => {
 
     if(!message.guild && !message.author.bot){
 
-        var botadmins = ['153276061163978752', '281109553834229761'];
+        var botadmins = ['153276061163978752'];
 
         for(var i = 0; i < botadmins.length; i++){
             if(message.author.id == botadmins[i]){
