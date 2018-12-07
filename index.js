@@ -118,8 +118,26 @@ bot.on('message', (message) => {
                             EmbedMsg(bot.users.get(botadmins[j]), 0x00ff00, 'Sent DM to: ' + bot.users.get(msg[1]).tag + '|' + bot.users.get(msg[1]).id, dmmsg);
                         }
                     } catch (err){
-                        log('non existent userid.');
-                        EmbedMsg(message.author, 0x00ff00, 'Error sending message', 'There was an error sending that message, maybe the bot isn\'t on a server with the user, or you misspelled the userID. 💩');
+                        msgchnl = "";
+                        bot.guilds.forEach(guild => {
+                            guild.channels.forEach(GuildChannel => {
+                                if(GuildChannel.type = "text"){
+                                    if(GuildChannel.id = msg[1]){
+                                        msgchnl = GuildChannel;
+                                    }
+                                }
+                            });
+                        });
+                        try{
+                            bot.channels.get(msg[1]).send(dmmsg);
+                            log('Message sent to ' + msgchnl.name + ': ' + dmmsg);
+                            for(var j = 0; j < botadmins.length; j++){
+                                EmbedMsg(bot.users.get(botadmins[j]), 0x00ff00, 'Sent DM to: ' + msgchnl.name + '|' + msgchnl.id, dmmsg);
+                            }
+                        } catch (err2){
+                            log('non existent userid/channelid.');
+                            EmbedMsg(message.author, 0x00ff00, 'Error sending message', 'There was an error sending that message, maybe the bot isn\'t on a server with the user, or you misspelled the userID. 💩');
+                        }
                     }
                 }
     
