@@ -121,8 +121,8 @@ bot.on('message', (message) => {
                         msgchnl = "";
                         bot.guilds.forEach(guild => {
                             guild.channels.forEach(GuildChannel => {
-                                if(GuildChannel.type = "text"){
-                                    if(GuildChannel.id = msg[1]){
+                                if(GuildChannel.type == "text"){
+                                    if(GuildChannel.id == msg[1]){
                                         msgchnl = GuildChannel;
                                     }
                                 }
