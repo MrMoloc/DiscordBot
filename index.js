@@ -212,7 +212,8 @@ bot.on('message', (message) => {
 
             // Verbotene Wörter einfach löschen
             badwords.bw.forEach(word => {
-                if(message.content.indexOf(word) + 1) {
+                cont = message.content.toLowerCase();
+                if(cont.indexOf(word) + 1) {
                     message.delete();
                     console.log(getTimeStamp() + " " + author.tag + " said a bad word: " + word);
                 }
