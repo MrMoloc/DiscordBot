@@ -92,9 +92,21 @@ bot.on('roleUpdate', (oldRole, newRole) => {
 
 bot.on('error', (err) => {
     try{
-        console.error(getTimeStamp() + " " + JSON.stringify(err));
-    }catch(err2){
-        console.error(getTimeStamp() + " " + err);
+        if(err.error.code == "ECONNRESET"){
+            log("Connection lost to: " + err.target.url);
+        } else {
+            try{
+                console.error(getTimeStamp() + " " + JSON.stringify(err));
+            }catch(err2){
+                console.error(getTimeStamp() + " " + err);
+            }
+        }
+    }catch(err3){
+        try{
+            console.error(getTimeStamp() + " " + JSON.stringify(err));
+        }catch(err2){
+            console.error(getTimeStamp() + " " + err);
+        }
     }
 });
 
