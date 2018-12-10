@@ -91,7 +91,11 @@ bot.on('roleUpdate', (oldRole, newRole) => {
 })
 
 bot.on('error', (err) => {
-    console.error(getTimeStamp + " " + err);
+    try{
+        console.error(getTimeStamp() + " " + JSON.stringify(err));
+    }catch(err2){
+        console.error(getTimeStamp() + " " + err);
+    }
 });
 
 bot.on('message', (message) => {
