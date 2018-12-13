@@ -28,6 +28,8 @@ var counts = {
 bot.login(key.data);
 bot.on('ready', () => {
 
+    //bot.user.setAvatar('./eyes.png').then(user => log("New avatar set!")).catch(console.error);
+
     log('Logged in as ' + bot.user.tag + '!');
     bot.guilds.forEach(function(guild, guildID) {
         db.data.updateGuild(guild);
@@ -798,24 +800,25 @@ bot.on('message', (message) => {
                         break;
 
                     case 'rule':
-                    if(userperm >= perms.rule){
-                        if(msg.length == 2){
+                        if(userperm >= perms.rule){
+                            if(msg.length == 2){
 
-                            db.data.getRule(msg[1], message.guild.id, function(res){
-                                if(res.code == 0){
-                                    EmbedMsg(message.channel, 0x0000ff, 'Rule ' + msg[1], res.result[0].rule);
-                                } else if(res.code == 1) {
-                                    EmbedMsg(message.channel, 0xff0000, 'Not found', 'I couldn\'t find the rule you specified');
-                                }
-                                
-                            })
+                                db.data.getRule(msg[1], message.guild.id, function(res){
+                                    if(res.code == 0){
+                                        EmbedMsg(message.channel, 0x0000ff, 'Rule ' + msg[1], res.result[0].rule);
+                                        message.delete();
+                                    } else if(res.code == 1) {
+                                        EmbedMsg(message.channel, 0xff0000, 'Not found', 'I couldn\'t find the rule you specified');
+                                    }
+                                    
+                                })
 
+                            } else {
+                                SendSyntaxErr(message.channel);
+                            }
                         } else {
-                            SendSyntaxErr(message.channel);
+                            noPerm(message.channel);
                         }
-                    } else {
-                        noPerm(message.channel);
-                    }
                         
 
                         break;
