@@ -479,14 +479,31 @@ bot.on('message', (message) => {
 
                                                             // Wenn die Warning gelöscht wurde Durchstreichen und hinzufügen zum Array
                                                             if(res.result[i].deletiontime != null) {
-                                                                fields.push({
-                                                                    name: '__Warning ID '+res.result[i].warningID+'__',
-                                                                    value: '~~Warning from:\t'+res.result[i].issuerName
-                                                                    + '\nWarning text:\t'+res.result[i].warningtext
-                                                                    + '\nIssued at:\t'+res.result[i].creationtime+'~~'
-                                                                    + '\nDeleted at:\t'+res.result[i].deletiontime
-                                                                    + '\nDeleted from:\t'+bot.users.get(res.result[i].deletedbyuserID).username
-                                                                });
+                                                                try{
+                                                                    fields.push({
+                                                                        name: '__Warning ID '+res.result[i].warningID+'__',
+                                                                        value: '~~Warning from:\t'+res.result[i].issuerName
+                                                                        + '\nWarning text:\t'+res.result[i].warningtext
+                                                                        + '\nIssued at:\t'+res.result[i].creationtime+'~~'
+                                                                        + '\nDeleted at:\t'+res.result[i].deletiontime
+                                                                        + '\nDeleted from:\t'+bot.users.get(res.result[i].deletedbyuserID).username
+                                                                    });
+                                                                } catch(err){
+                                                                    db.data.getUserbyID(res.result[i].deletedbyuserID, function(resu){
+                                                                        if(resu != null){
+                                                                            fields.push({
+                                                                                name: '__Warning ID '+res.result[i].warningID+'__',
+                                                                                value: '~~Warning from:\t'+res.result[i].issuerName
+                                                                                + '\nWarning text:\t'+res.result[i].warningtext
+                                                                                + '\nIssued at:\t'+res.result[i].creationtime+'~~'
+                                                                                + '\nDeleted at:\t'+res.result[i].deletiontime
+                                                                                + '\nDeleted from:\t'+resu
+                                                                            });
+                                                                        } else {
+                                                                            EmbedMsg(message.channel, 0xff0000, "JavaScript is retarded", "NodeJS is retarded and so is Moloc");
+                                                                        }
+                                                                    });
+                                                                }
                                                             } else {
                                                                 // Wenn Warning nicht gelöscht, dann einfach zum Array hinzufügen
                                                                 fields.push({

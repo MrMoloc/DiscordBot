@@ -8,6 +8,18 @@ var con = mysql.createConnection(key.db);
 // Die Funtionen werden in eine Variable gespeichert.
 var methods = {
 
+    getUserbyID: function(userid, cb){
+
+        con.query('SELECT username FROM user WHERE userID = ?', userid, function(err, result){
+            if(err) {
+                cb({code: 1, result: err});
+            } else {
+                cb({code: 0, result: result[0].username});
+            }
+        });
+
+    },
+
     newWarn: function(member, issuer, warntext, cb) {
 
         // Variable wird erstellt, die nacher in die DB eingefügt wird.
