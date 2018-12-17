@@ -507,7 +507,7 @@ bot.on('message', (message) => {
                                                                     + '\nIssued at:\t'+res.result[i].creationtime
                                                                 });
                                                             }
-                    
+                                                            
                                                         }
                     
                                                         // Die Embedded Message bauen mit dem Array von vorher (warnings)

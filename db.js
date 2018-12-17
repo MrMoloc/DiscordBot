@@ -295,27 +295,6 @@ var methods = {
 
     updateUser: function(member) {
 
-        // Überprüfen, ob übergebene Variable auch einem Member entspricht.
-        if(member instanceof Discord.GuildMember) {
-
-            // GuildMember von der DB holen
-            con.query('SELECT * FROM useringuild WHERE guildID = ? AND userID = ?', [member.guild.id, member.user.id], function(err, resu) {
-                
-                if(err) log(err);
-                // Wenn noch kein Eintrag ist, dann den User in die DB schreiben.
-                if(!resu[0]) {
-
-                    con.query('INSERT INTO useringuild SET ?', {guildID: member.guild.id, userID: member.user.id}, function(err, resul) {
-                        if(err) log(err);
-                        log('Added '+member.user.tag+' to the users');
-                    })
-
-                }
-
-            });
-
-        }
-
         // Den Member zu einem User machen wenn nötig
         var us;
         if(member instanceof Discord.GuildMember) {
@@ -325,7 +304,7 @@ var methods = {
         }
 
         // User Updaten, das ganze Zeug wie oben mit dem GuildMember... Bla bla bla
-        con.query('SELECT * FROM user WHERE userID = ' + us.id, function (err, result, fields) {
+        con.query('SELECT * FROM user WHERE userID = ' + us.id, function(err, result) {
 
             if(err) log(err);
             if(!result[0]) {
@@ -335,9 +314,9 @@ var methods = {
                         log(err);
                     } else {
                         log('Added '+us.tag+' to the users');
-                        
                     }
-                })
+                    rofl();
+                });
 
             } else if(result[0].username != us.username) {
 
@@ -347,8 +326,34 @@ var methods = {
                     } else {
                         log('Updated '+us.username+' in DB');
                     }
+                    rofl();
                 })
 
+            } else {
+                rofl();
+            }
+
+            function rofl(){
+                // Überprüfen, ob übergebene Variable auch einem Member entspricht.
+                if(member instanceof Discord.GuildMember) {
+
+                    // GuildMember von der DB holen
+                    con.query('SELECT * FROM useringuild WHERE guildID = ? AND userID = ?', [member.guild.id, member.user.id], function(err, resu) {
+                        
+                        if(err) log(err);
+                        // Wenn noch kein Eintrag ist, dann den User in die DB schreiben.
+                        if(!resu[0]) {
+
+                            con.query('INSERT INTO useringuild SET ?', {guildID: member.guild.id, userID: member.user.id}, function(err, resul) {
+                                if(err) log(err);
+                                log('Added '+member.user.tag+' to the users');
+                            })
+
+                        }
+
+                    });
+
+                }
             }
 
         });
