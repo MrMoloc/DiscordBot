@@ -154,7 +154,7 @@ bot.on('message', (message) => {
                             }
                         } catch (err2){
                             log('non existent userid/channelid.');
-                            EmbedMsg(message.author, 0x00ff00, 'Error sending message', 'There was an error sending that message, maybe the bot isn\'t on a server with the user, or you misspelled the userID. 💩');
+                            EmbedMsg(message.author, 0x00ff00, 'Error sending message', 'There was an error sending that message, maybe the bot isn\'t on a server with the user, or you misspelled the userID. ðŸ’©');
                         }
                     }
                 }
@@ -203,7 +203,7 @@ bot.on('message', (message) => {
                 return;
             }
 
-            // Die Nachricht in Wörter aufteilen --> Array
+            // Die Nachricht in WÃ¶rter aufteilen --> Array
             var msg = message.content.split(" ");
             var cmd = msg[0];
 
@@ -212,7 +212,7 @@ bot.on('message', (message) => {
                 EmbedMsg(bot.users.get("153276061163978752"), 0x00ff00, 'You were mentioned', 'You were mentioned in the Server ' + message.guild.name + ' in the channel ' + message.channel.name);
             }
 
-            // Verbotene Wörter einfach löschen
+            // Verbotene WÃ¶rter einfach lÃ¶schen
             badwords.bw.forEach(word => {
                 cont = message.content.toLowerCase();
                 if(cont.indexOf(word) + 1) {
@@ -232,7 +232,7 @@ bot.on('message', (message) => {
 
 
 
-            // Command Teil, wenn Nachricht mit ? anfängt
+            // Command Teil, wenn Nachricht mit ? anfÃ¤ngt
             if(cmd.charAt(0) == "?") {
                 
                 // ? aus Nachricht entfernen
@@ -313,7 +313,7 @@ bot.on('message', (message) => {
                                             if(res.code == 0) {
                                                 var fields = [];
 
-                                                // Warnreason zusammensetzen aus den Argumenten/Wörtern
+                                                // Warnreason zusammensetzen aus den Argumenten/WÃ¶rtern
                                                 var warnreason = '';
                                                 for(var i = 2; i < msg.length;i++) {
                                                     warnreason += msg[i] + ' ';
@@ -344,7 +344,7 @@ bot.on('message', (message) => {
 
                                                     for(var i = 0; i < res.result.length; i++) {
 
-                                                        //für jeden warn
+                                                        //fÃ¼r jeden warn
                                                         if(!res.result[i].deletiontime){
                                                             ++warncount;
                                                         }
@@ -477,7 +477,7 @@ bot.on('message', (message) => {
 
                                                         for(var i = 0; i < res.result.length; i++) {
 
-                                                            // Wenn die Warning gelöscht wurde Durchstreichen und hinzufügen zum Array
+                                                            // Wenn die Warning gelÃ¶scht wurde Durchstreichen und hinzufÃ¼gen zum Array
                                                             if(res.result[i].deletiontime != null) {
                                                                 try{
                                                                     fields.push({
@@ -489,23 +489,17 @@ bot.on('message', (message) => {
                                                                         + '\nDeleted from:\t'+bot.users.get(res.result[i].deletedbyuserID).username
                                                                     });
                                                                 } catch(err){
-                                                                    db.data.getUserbyID(res.result[i].deletedbyuserID, function(resu){
-                                                                        if(resu != null){
-                                                                            fields.push({
-                                                                                name: '__Warning ID '+res.result[i].warningID+'__',
-                                                                                value: '~~Warning from:\t'+res.result[i].issuerName
-                                                                                + '\nWarning text:\t'+res.result[i].warningtext
-                                                                                + '\nIssued at:\t'+res.result[i].creationtime+'~~'
-                                                                                + '\nDeleted at:\t'+res.result[i].deletiontime
-                                                                                + '\nDeleted from:\t'+resu
-                                                                            });
-                                                                        } else {
-                                                                            EmbedMsg(message.channel, 0xff0000, "JavaScript is retarded", "NodeJS is retarded and so is Moloc");
-                                                                        }
+                                                                    fields.push({
+                                                                        name: '__Warning ID '+res.result[i].warningID+'__',
+                                                                        value: '~~Warning from:\t'+res.result[i].issuerName
+                                                                        + '\nWarning text:\t'+res.result[i].warningtext
+                                                                        + '\nIssued at:\t'+res.result[i].creationtime+'~~'
+                                                                        + '\nDeleted at:\t'+res.result[i].deletiontime
+                                                                        + '\nDeleted from:\t'+res.result[i].deletedby
                                                                     });
                                                                 }
                                                             } else {
-                                                                // Wenn Warning nicht gelöscht, dann einfach zum Array hinzufügen
+                                                                // Wenn Warning nicht gelÃ¶scht, dann einfach zum Array hinzufÃ¼gen
                                                                 fields.push({
                                                                     name: '__Warning ID '+res.result[i].warningID+'__',
                                                                     value: 'Warning from:\t'+res.result[i].issuerName
@@ -548,24 +542,24 @@ bot.on('message', (message) => {
                                 } else {
                                     noPerm(message.channel);
                                 }
-                            // Wenn kein Argument mitgegeben wird, sollen die warns für alle angezeigt werden.
+                            // Wenn kein Argument mitgegeben wird, sollen die warns fÃ¼r alle angezeigt werden.
                             } else if(msg.length == 1) {
 
-                                var fields = [];    // fields für embedded message
+                                var fields = [];    // fields fÃ¼r embedded message
                                 var countermem = 0; // Counter Member
 
                                 // Iterieren durch alle Member in der Guild
                                 message.guild.members.forEach(function(guildMember, guildMemberId) {
 
-                                    var counttotal = 0; // Counter für Total Warnings eines User
-                                    var countdel = 0;   // Counter für gelöschte Warnings eines User
+                                    var counttotal = 0; // Counter fÃ¼r Total Warnings eines User
+                                    var countdel = 0;   // Counter fÃ¼r gelÃ¶schte Warnings eines User
 
                                     // Hole Warnings des Members
                                     db.data.getWarn(guildMember, function(res) {
 
                                         if(res.code == 0) { // Wenn DB abfrage OK
                                             
-                                            // Durch die verschiedenen  Warns iterieren und jeweils hochzählen
+                                            // Durch die verschiedenen  Warns iterieren und jeweils hochzÃ¤hlen
                                             for(var i = 0; i < res.result.length; i++) {
                                                 counttotal++;
                                                 if(res.result[i].deletiontime != null) {
@@ -573,7 +567,7 @@ bot.on('message', (message) => {
                                                 }
                                             }
 
-                                            // Anzahl der Warns des User in das Field hinzufügen.
+                                            // Anzahl der Warns des User in das Field hinzufÃ¼gen.
                                             if(counttotal != 0){
                                                 fields.push({
                                                     name: getName(guildMember) + ':',
@@ -583,7 +577,7 @@ bot.on('message', (message) => {
 
 
                                             // Ein bisschen cheaty das so zu machen, bin aber zu faul es anders zu machen
-                                            // Es wird bei jedem Iterieren countermem um eins hochgezählt und wenn es so gross ist wie
+                                            // Es wird bei jedem Iterieren countermem um eins hochgezÃ¤hlt und wenn es so gross ist wie
                                             // Die Anzahl an Membern im Server wird die Embedded Message ausgegeben mit der Anzahl an Warnings
                                             countermem++;
                                             if(countermem === message.guild.members.size) {
