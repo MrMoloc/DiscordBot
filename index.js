@@ -16,7 +16,8 @@ var perms = {
     role: 1,
     addclaim: 4,
     delclaim: 4,
-    rule: 1
+    rule: 1,
+    prune: 3
 }
 
 var counts = {
@@ -834,6 +835,26 @@ bot.on('message', (message) => {
 
                         break;
 
+                    case 'prune':
+                        
+                        if(userperm >= perms.prune){
+                            if(msg.length == 2){
+                                msg[1] = msg[1]-0;
+                                if(!isNaN(msg[1])){
+                                    message.channel.bulkDelete(msg[1]+1)
+                                    .then(function(){
+                                        message.channel.send("Last " + msg[1] + " messages have been deleted!")
+                                            .then(message2 => message2.delete(5000)).catch(console.error);
+                                        log(msg[1] + " messages have been deleted by " + message.author.tag)
+                                    });
+                                }
+                            }
+                        } else {
+                            noPerm(message.channel);
+                        }
+
+                        break;
+                    
                     default:
 
                         break;
