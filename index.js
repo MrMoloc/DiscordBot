@@ -287,14 +287,6 @@ bot.on('message', (message) => {
                         }
                         break;
 
-                    /*case 'test':
-                        if(userperm >= perms.test){
-                            EmbedMsg(message.channel, 0x0000ff, 'Warning issued', mention(author) + ' warned the user ' + mention(author) + ' for the reason:\n He\'s a lol LMAO');
-                        } else {
-                            noPerm(message.channel);
-                        }
-                        break;*/
-
                     //?warn
                     case "warn":
                         if(userperm >= perms.warn){
