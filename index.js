@@ -242,34 +242,40 @@ bot.on('message', (message) => {
                 switch(cmd.toLowerCase()) {
 
                     //Hilfe
-                        case 'help':
+                    case 'help':
 
-                        message.channel.send({
-                            embed: {
-                                color: 0x0000ff,
-                                fields: [{
-                                    name: 'swisstime',
-                                    value: 'Syntax: `?swisstime`\nDescription: Returns the current time in Switzerland (CET/CEST).'
-                                },{
-                                    name: 'warn',
-                                    value: 'Syntax: `?warn @user reason`\nDescription: Warns a user and if a user has enough warns, he gets punished.'
-                                },{
-                                    name: 'warnlog',
-                                    value: 'Syntax: `?warnlog [@user]`\nDescription: Either returns the warnings of a specific user or the warnings of all users.'
-                                },{
-                                    name: 'delwarn',
-                                    value: 'Syntax: `?delwarn warnID`\nDescription: Deletes a warning, so it doesn\'t count towards a punishement.'
-                                },{
-                                    name: 'joindate',
-                                    value: 'Syntax: `?joindate [@user]`\nDescription: Returns the date and time someone last joined this Discord.'
-                                },{
-                                    name: 'rule',
-                                    value: 'Syntax: `?rule rulename`\nDescription: shows one rule.'
-                                }]
-                            }
-                        });
+                    message.channel.send({
+                        embed: {
+                            color: 0x0000ff,
+                            fields: [{
+                                name: 'swisstime',
+                                value: 'Syntax: `?swisstime`\nDescription: Returns the current time in Switzerland (CET/CEST).'
+                            },{
+                                name: 'warn',
+                                value: 'Syntax: `?warn @user reason`\nDescription: Warns a user and if a user has enough warns, he gets punished.'
+                            },{
+                                name: 'warnlog',
+                                value: 'Syntax: `?warnlog [@user]`\nDescription: Either returns the warnings of a specific user or the warnings of all users.'
+                            },{
+                                name: 'delwarn',
+                                value: 'Syntax: `?delwarn warnID`\nDescription: Deletes a warning, so it doesn\'t count towards a punishement.'
+                            },{
+                                name: 'joindate',
+                                value: 'Syntax: `?joindate [@user]`\nDescription: Returns the date and time someone last joined this Discord.'
+                            },{
+                                name: 'rule',
+                                value: 'Syntax: `?rule rulename`\nDescription: shows one rule.'
+                            },{
+                                name: 'role',
+                                value: 'Syntax: `?role [role]`\nDescription: Lists all claimable roles you can get or if you provide a role you claim a role.'
+                            },{
+                                name: 'prune',
+                                value: 'Syntax: `?prune number`\nDescription: Deletes the last *number* of messages sent in this channel'
+                            }]
+                        }
+                    });
 
-                        break;
+                    break;
 
                     // Datum und Zeit in der Schweiz ausgeben.
                     case "swisstime":
@@ -724,6 +730,16 @@ bot.on('message', (message) => {
                                     }
                                 });
 
+                            } else if(msg.length == 1){
+                                
+                                db.data.claimableRoles(message.guild, function(roles){
+                                    var clroles = '';
+                                    roles.result.forEach(function(val){
+                                        clroles += val.rolename + '\n';
+                                    })
+                                    EmbedMsg(message.channel, 0x00ff00, 'Claimable roles:', clroles)
+                                });
+
                             } else {
                                 SendSyntaxErr(message.channel);
                             }
@@ -839,14 +855,16 @@ bot.on('message', (message) => {
                         
                         if(userperm >= perms.prune){
                             if(msg.length == 2){
-                                msg[1] = msg[1]-0;
                                 if(!isNaN(msg[1])){
+                                    msg[1] = msg[1]-0;
                                     message.channel.bulkDelete(msg[1]+1)
                                     .then(function(){
                                         message.channel.send("Last " + msg[1] + " messages have been deleted!")
                                             .then(message2 => message2.delete(5000)).catch(console.error);
                                         log(msg[1] + " messages have been deleted by " + message.author.tag)
                                     });
+                                } else {
+                                    SendSyntaxErr(message.channel);
                                 }
                             }
                         } else {
