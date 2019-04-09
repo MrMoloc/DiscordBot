@@ -25,6 +25,8 @@ var counts = {
     ban: 5
 }
 
+var openwarns = new Array();
+
 
 bot.login(key.data);
 bot.on('ready', () => {
@@ -113,6 +115,38 @@ bot.on('error', (err) => {
     }
 });
 
+bot.on('messageReactionAdd', (reaction, reactuser) => {
+
+    if(reaction.emoji == '⚠'){
+
+        var reactmember;
+
+        reaction.message.guild.members.forEach(member =>{
+            if(member.user == reactuser){
+                reactmember = member;
+            }
+        })
+
+        db.data.getPermLvl(reactmember, function(res){
+            var userperm = res.result;
+
+            if(userperm >= perms.warn){
+                EmbedMsg(reaction.message.channel, 0x0000ff, 'Issue warning', 'Hello ' + mention(reactmember.user) + ', it seems you want to warn *' + reaction.message.member.displayName +
+                '*\nIf you want to do so please type your reason.\nIf this happened by mistake react to this message with ❌')
+
+                openwarns.push({member: reactmember, reaction: reaction})
+                //setTimeout(removeOpenWarn, 300000, {member: reactmember, reaction: reaction})
+                setTimeout(removeOpenWarn, 3000, {member: reactmember, reaction: reaction})
+            }
+
+        })
+
+    } else if (reaction.emoji == '❌' && reaction.message.author == bot.user && reaction.message.embeds[0].fields[0].name == 'Issue warning'){
+        
+    }
+
+})
+
 bot.on('message', (message) => {
 
     if(!message.guild && !message.author.bot){
@@ -194,6 +228,16 @@ bot.on('message', (message) => {
     }
 
     if(message.guild){
+
+
+        openwarns.forEach(obj => {
+            console.log(openwarns)
+            if(obj.member == message.member && obj.reaction.message.channel == message.channel){
+                console.log(obj)
+                db.data.newWarn(obj.reaction.message.member, message.member, message.content);
+            }
+        })
+
         db.data.getPermLvl(message.member, function(res){
             var userperm =  res.result;
 
@@ -742,7 +786,7 @@ bot.on('message', (message) => {
 
                         break;
 
-                    case 'addclaim':
+                    case 'addclaim': case 'addclaimable':
 
                         if(userperm >= perms.addclaim){
                             if(msg.length >= 2){
@@ -956,6 +1000,14 @@ function getName(member, cb) {
         return member.nickname;
     } else {
         return member.user.username;
+    }
+}
+
+function removeOpenWarn(obj){
+    try{
+        openwarns.splice(openwarns.indexOf(obj), 1);
+    } catch(err){
+        log(err)
     }
 }
 
