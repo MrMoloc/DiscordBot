@@ -266,6 +266,8 @@ bot.on('message', (message) => {
                     EmbedMsg(message.channel, 0x00ff00, 'Success!', 'You successfully warned ' + mention(obj.reaction.message.member) + ' for: ' + message.content);
                     db.data.getWarnLog(message.guild, function(res){
                         EmbedMsg(message.guild.channels.get(res.result), 0x0000ff, 'Warning issued', mention(message.author) + ' warned the user ' + mention(obj.reaction.message.member) + ' for the reason:\n' + message.content);
+                        obj.message.delete();
+                        obj.reaction.message.clearReactions();
                     });
                     log(message.author.tag + ' warned ' + obj.reaction.message.member.tag);
                     removeOpenWarn(obj);
