@@ -269,7 +269,7 @@ bot.on('message', (message) => {
                         obj.message.delete();
                         obj.reaction.message.clearReactions();
                     });
-                    log(message.author.tag + ' warned ' + obj.reaction.message.member.tag);
+                    log(message.author.tag + ' warned ' + obj.reaction.message.member.user.tag);
                     removeOpenWarn(obj);
                 });
             }
