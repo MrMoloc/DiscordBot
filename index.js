@@ -140,17 +140,25 @@ bot.on('messageReactionAdd', (reaction, reactuser) => {
                             '*\nIf you want to do so please type your reason.\nIf this happened by mistake react to this message with ❌'
                         }]
                     }
-                }).then(message => message.react('❌'));
+                })
+                .then(function(message){
+                    message.react('❌');
+                    openwarns.push({member: reactmember, reaction: reaction, message: message})
+                    setTimeout(function(){
+                        removeOpenWarn({member: reactmember, reaction: reaction, message: message});
+                        reaction.message.clearReactions();
+                        message.delete();
+                    }, 120000)
+                })
 
                                         //__Typ der zur nachricht reagiert
-                openwarns.push({member: reactmember, reaction: reaction})
+                //openwarns.push({member: reactmember, reaction: reaction})
                 //setTimeout(removeOpenWarn, 300000, {member: reactmember, reaction: reaction})
-                setTimeout(removeOpenWarn, 300000, {member: reactmember, reaction: reaction})
             }
 
         })
 
-    } else if (reaction.emoji == '❌' && reaction.message.author == bot.user && reaction.message.embeds[0].fields[0].name == 'Issue warning'){
+    } else if (reaction.emoji == '❌' && reaction.message.author == bot.user && reaction.message.embeds[0].fields[0].name == 'Issue warning' && !reactuser.bot){
 
         reaction.message.guild.members.forEach(member =>{
             if(member.user == reactuser){
@@ -158,7 +166,14 @@ bot.on('messageReactionAdd', (reaction, reactuser) => {
             }
         })
 
-        removeOpenWarn({member: reactmember, reaction: })
+        openwarns.forEach(obj => {
+            if(obj.member == reactmember && obj.reaction.message.channel == reaction.message.channel){
+                removeOpenWarn({member: reactmember, reaction: obj.reaction});
+                //EmbedMsg(obj.reaction.message.channel, 0x0000ff, )
+                obj.message.delete();
+                obj.reaction.message.clearReactions();
+            }
+        })
     }
 
 })
@@ -246,12 +261,14 @@ bot.on('message', (message) => {
     if(message.guild){
 
         openwarns.forEach(obj => {
-            console.log(openwarns)
             if(obj.member == message.member && obj.reaction.message.channel == message.channel){
-                console.log(obj)
-                log("ROFLMAO: " + message.content)
                 db.data.newWarn(obj.reaction.message.member, message.member, message.content, function(result){
-                    console.log(result)
+                    EmbedMsg(message.channel, 0x00ff00, 'Success!', 'You successfully warned ' + mention(obj.reaction.message.member) + ' for: ' + message.content);
+                    db.data.getWarnLog(message.guild, function(res){
+                        EmbedMsg(message.guild.channels.get(res.result), 0x0000ff, 'Warning issued', mention(message.author) + ' warned the user ' + mention(obj.reaction.message.member) + ' for the reason:\n' + message.content);
+                    });
+                    log(message.author.tag + ' warned ' + obj.reaction.message.member.tag);
+                    removeOpenWarn(obj);
                 });
             }
         })
