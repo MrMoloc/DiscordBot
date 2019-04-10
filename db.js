@@ -46,7 +46,7 @@ var methods = {
 
         // DB Abfrage: Alle Warnings von einem Meber einer Guild
         //con.query('SELECT * FROM warning WHERE warneduserID = ' + member.id + ' AND guildID = ' + member.guild.id, function (err, result) {
-        con.query('SELECT w.warningID, u.username AS deletedby, w.issuerID, u2.username AS issuerName, w.warningtext, w.creationtime, w.deletiontime, w.deletedbyuserID FROM warning AS w INNER JOIN user AS u ON w.deletedbyuserID=u.userID INNER JOIN user AS u2 ON w.issuerID=u2.userID WHERE w.warneduserID = ? AND w.guildID = ?', [member.id, member.guild.id], function(err, result){
+        con.query('SELECT w.warningID, u.username AS deletedby, w.issuerID, u2.username AS issuerName, w.warningtext, w.creationtime, w.deletiontime, w.deletedbyuserID FROM warning AS w LEFT JOIN user AS u ON w.deletedbyuserID=u.userID INNER JOIN user AS u2 ON w.issuerID=u2.userID WHERE w.warneduserID = ? AND w.guildID = ?', [member.id, member.guild.id], function(err, result){
             
             //Code zeugs zurückgeben
             if(err) {

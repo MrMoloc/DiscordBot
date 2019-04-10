@@ -131,18 +131,34 @@ bot.on('messageReactionAdd', (reaction, reactuser) => {
             var userperm = res.result;
 
             if(userperm >= perms.warn){
-                EmbedMsg(reaction.message.channel, 0x0000ff, 'Issue warning', 'Hello ' + mention(reactmember.user) + ', it seems you want to warn *' + reaction.message.member.displayName +
-                '*\nIf you want to do so please type your reason.\nIf this happened by mistake react to this message with ❌')
+                reaction.message.channel.send({
+                    embed: {
+                        color: 0x0000ff,
+                        fields: [{
+                            name: 'Issue warning',
+                            value: 'Hello ' + mention(reactmember.user) + ', it seems you want to warn *' + reaction.message.member.displayName +
+                            '*\nIf you want to do so please type your reason.\nIf this happened by mistake react to this message with ❌'
+                        }]
+                    }
+                }).then(message => message.react('❌'));
 
+                                        //__Typ der zur nachricht reagiert
                 openwarns.push({member: reactmember, reaction: reaction})
                 //setTimeout(removeOpenWarn, 300000, {member: reactmember, reaction: reaction})
-                setTimeout(removeOpenWarn, 3000, {member: reactmember, reaction: reaction})
+                setTimeout(removeOpenWarn, 300000, {member: reactmember, reaction: reaction})
             }
 
         })
 
     } else if (reaction.emoji == '❌' && reaction.message.author == bot.user && reaction.message.embeds[0].fields[0].name == 'Issue warning'){
-        
+
+        reaction.message.guild.members.forEach(member =>{
+            if(member.user == reactuser){
+                reactmember = member;
+            }
+        })
+
+        removeOpenWarn({member: reactmember, reaction: })
     }
 
 })
@@ -229,12 +245,14 @@ bot.on('message', (message) => {
 
     if(message.guild){
 
-
         openwarns.forEach(obj => {
             console.log(openwarns)
             if(obj.member == message.member && obj.reaction.message.channel == message.channel){
                 console.log(obj)
-                db.data.newWarn(obj.reaction.message.member, message.member, message.content);
+                log("ROFLMAO: " + message.content)
+                db.data.newWarn(obj.reaction.message.member, message.member, message.content, function(result){
+                    console.log(result)
+                });
             }
         })
 
