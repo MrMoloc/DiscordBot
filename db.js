@@ -206,6 +206,20 @@ var methods = {
 
     },
 
+    claimableRoleswemoji: function(guild, cb){
+
+        con.query('SELECT * FROM roles WHERE guildID = ? AND assignemoji IS NOT NULL AND assigngroup IS NOT NULL AND selfassign = 1', guild.id, function(err, result){
+
+            if(err) {
+                cb({code: 1, result: err});
+            } else {
+                cb({code: 0, result: result});
+            }
+
+        });
+
+    },
+
     addClaimable: function(guild, role, cb){
 
         con.query('UPDATE roles SET selfassign = 1 WHERE guildID = ? AND roleID = ?', [guild.id, role.id], function(err, res){

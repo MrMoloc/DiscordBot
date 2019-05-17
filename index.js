@@ -17,7 +17,8 @@ var perms = {
     addclaim: 4,
     delclaim: 4,
     rule: 1,
-    prune: 3
+    prune: 3,
+    roleclaims: 4
 }
 
 var counts = {
@@ -460,11 +461,13 @@ bot.on('message', (message) => {
                                                                                 value: "You have been automatically banned from the " + warnedUser.guild.name + " Discord because you have been warned " + counts.ban + " times.\nIf you think this was a mistake, please contact @Moloc#1337"
                                                                             }]
                                                                         }
-                                                                    }).then(warnedUser.ban('Banned automatically: Max warns.').then(function(){
-                                                                        EmbedMsg(message.channel, 0x00ff00, 'Success!', 'You successfully warned ' + mention(warnedUser) + ' for: ' + warnreason + '\nThe user also has been auto-banned, since he reached ' + counts.ban + ' warnings.');
-                                                                        EmbedMsg(message.guild.channels.get(res.result), 0x00ff00, 'Autoban issued', mention(warnedUser.user) + ' has been banned automatically because he reached ' + counts.ban + ' warnings.');
-                                                                        log(warnedUser.user.tag + ' has been autobanned');
-                                                                    }));
+                                                                    }).then(setTimeout(function(){
+                                                                        warnedUser.ban('Banned automatically: Max warns.').then(function(){
+                                                                            EmbedMsg(message.channel, 0x00ff00, 'Success!', 'You successfully warned ' + mention(warnedUser) + ' for: ' + warnreason + '\nThe user also has been auto-banned, since he reached ' + counts.ban + ' warnings.');
+                                                                            EmbedMsg(message.guild.channels.get(res.result), 0x00ff00, 'Autoban issued', mention(warnedUser.user) + ' has been banned automatically because he reached ' + counts.ban + ' warnings.');
+                                                                            log(warnedUser.user.tag + ' has been autobanned');
+                                                                        });
+                                                                    }, 1000))
                                                                 } else if(warncount == counts.kick){
                                                                     bot.users.get(warnedUser.id).send({
                                                                         embed: {
@@ -474,11 +477,18 @@ bot.on('message', (message) => {
                                                                                 value: "You have been automatically kicked from the " + warnedUser.guild.name + " Discord because you have been warned " + counts.kick + " times.\nYou can rejoin, but at " + counts.ban + " warnings you will be automatically banned."
                                                                             }]
                                                                         }
-                                                                    }).then(warnedUser.kick('Kicked automatically: Max warns.').then(function(){
+                                                                    }).then(setTimeout(function(){
+                                                                        warnedUser.kick('Kicked automatically: Max warns.').then(function(){
+                                                                            EmbedMsg(message.channel, 0x00ff00, 'Success!', 'You successfully warned ' + mention(warnedUser) + ' for: ' + warnreason + '\nThe user also has been auto-kicked, since he reached ' + counts.kick + ' warnings.');
+                                                                            EmbedMsg(message.guild.channels.get(res.result), 0x00ff00, 'AutoKick issued', mention(warnedUser.user) + ' has been kicked automatically because he reached ' + counts.kick + ' warnings.');
+                                                                            log(warnedUser.user.tag + ' has been autokicked');
+                                                                        })
+                                                                    }, 1000))
+                                                                    /*then(warnedUser.kick('Kicked automatically: Max warns.').then(function(){
                                                                         EmbedMsg(message.channel, 0x00ff00, 'Success!', 'You successfully warned ' + mention(warnedUser) + ' for: ' + warnreason + '\nThe user also has been auto-kicked, since he reached ' + counts.kick + ' warnings.');
                                                                         EmbedMsg(message.guild.channels.get(res.result), 0x00ff00, 'AutoKick issued', mention(warnedUser.user) + ' has been kicked automatically because he reached ' + counts.kick + ' warnings.');
                                                                         log(warnedUser.user.tag + ' has been autokicked');
-                                                                    }));
+                                                                    }));*/
                                                                 } else {
                                                                     EmbedMsg(message.channel, 0x00ff00, 'Success!', 'You successfully warned ' + mention(warnedUser) + ' for: ' + warnreason);
                                                                 }
@@ -946,6 +956,32 @@ bot.on('message', (message) => {
 
                         break;
                     
+                    /*case 'roleclaims':
+
+                        if(userperm >= perms.roleclaims){
+                            db.data.claimableRoleswemoji(message.channel.guild, function(res){
+                                var fields;
+
+                                embed: {
+                                    color: 0x0000ff,
+                                    fields: [{
+                                        name: 'Issue warning',
+                                        value: 'Hello ' + mention(reactmember.user) + ', it seems you want to warn *' + reaction.message.member.displayName +
+                                        '*\nIf you want to do so please type your reason.\nIf this happened by mistake react to this message with ❌'
+                                    }]
+                                }
+
+                                res.result.forEach(funtion(resu){
+                                    
+                                    fields
+
+                                })
+                                console.log(res.result[0]);
+                            })
+                        } else {
+                            noPerm(message.channel);
+                        }
+                        break;*/
                     default:
 
                         break;
